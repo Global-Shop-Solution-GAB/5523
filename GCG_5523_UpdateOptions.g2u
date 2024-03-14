@@ -1,0 +1,62 @@
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+f.Intrinsic.Control.Try
+'Try something
+	f.Intrinsic.UI.InvokeWaitDialog("Processing...")
+	f.Intrinsic.Control.CallSub(GetProjects)
+	f.Intrinsic.UI.CloseWaitDialog
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.GetProjects.Start
+v.Local.sSQL.Declare
+v.Local.sPojects.Declare
+v.Local.iCnt.Declare
+
+f.Intrinsic.Control.Try
+	'Get Distinct Project Names.
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("projectsDT", "con", "Select Distinct ProjectName from GCG_5523_EDI_OPTIONS", true)
+	f.ODBC.Connection!con.Close
+	'Loop Through them to check if they have Group by User 1
+	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.DataTable.projectsDT.RowCount--, 1)
+		v.Local.sPojects.Set(v.DataTable.projectsDT(v.Local.iCnt).ProjectName!FieldVal)
+		
+		f.ODBC.Connection!con.OpenCompanyConnection
+			f.Intrinsic.String.Build("select * from GCG_5523_EDI_OPTIONS where ProjectName = '{0}' and orderid > 14 order by ProjectName, OrderID asc;", v.Local.sPojects, v.Local.sSQL)
+			f.Data.DataTable.CreateFromSQL("singleDT", "con", v.Local.sSQL)
+		f.ODBC.Connection!con.Close
+
+		f.Intrinsic.Control.If(v.DataTable.singleDT(v.Local.iCnt).FieldTitle!FieldValTrim, =, "Grp_L_User_1")
+		f.Intrinsic.Control.Else
+			f.Data.DataTable.SetSeries("singleDT", "orderID", 16, 1)
+			f.Data.DataTable.AddRow("singleDT", "FieldTitle", "Grp_L_User_1", "FIELDVALUE", "0", "FIELDTYPE", "GroupL_By", "ProjectName", v.Local.sPojects, "UPDATEDBYUSER", v.Caller.User, "orderID", 15)
+			f.ODBC.Connection!con.OpenCompanyConnection
+				f.Data.DataTable.SaveToDB("singleDT", "con", "GCG_5523_EDI_OPTIONS", "ProjectName*!*OrderID", 256)
+			f.ODBC.Connection!con.Close
+		f.Intrinsic.Control.EndIf
+		
+		f.Data.DataTable.Close("singleDT")
+	f.Intrinsic.Control.Next(v.Local.iCnt)
+	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.GetProjects.End
+
+Program.Sub.ErrorMsg.Start
+v.Local.sError.Declare
+
+'Closes ODBC connection, default to connection : "con"
+f.Intrinsic.Control.If(v.ODBC!con.State, =, 1)
+	f.ODBC.Connection!con.Close
+f.Intrinsic.Control.EndIf
+
+'Generic Error message.
+f.Intrinsic.String.Build("Project ProjectName.g2u {0}{0}Subroutine: {1}{0}Error: {2} with Description: {3}", v.Ambient.NewLine, v.Args.CurrentSub, v.Ambient.ErrorNumber, v.Ambient.ErrorDescription, v.Local.sError)
+f.Intrinsic.UI.Msgbox(v.Local.sError)
+Program.Sub.ErrorMsg.End
