@@ -1,0 +1,218 @@
+Program.Sub.ScreenSU.Start
+Gui.Form..Create
+Gui.Form..Size(9150,2430)
+Gui.Form..MinX(0)
+Gui.Form..MinY(0)
+Gui.Form..Position(0,0)
+Gui.Form..BackColor(-2147483633)
+Gui.Form..MousePointer(0)
+Gui.Form..Caption("EDI Project File Upload")
+Gui.Form..MaxButton(False)
+Gui.Form..Sizeable(False)
+Gui.Form..Event(UnLoad,Form_UnLoad)
+Gui.Form.tab1.Create(Tab)
+Gui.Form.tab1.Size(8820,1740)
+Gui.Form.tab1.Position(75,75)
+Gui.Form.tab1.Tabs(2)
+Gui.Form.tab1.SetTab(0)
+Gui.Form.tab1.Caption("Import")
+Gui.Form.tab1.SetTab(1)
+Gui.Form.tab1.Caption("Export")
+Gui.Form.txtFilePath.Create(TextBox,"",True,8040,300,0,75,345,True,0,"Arial",8,-2147483643,1)
+Gui.Form.txtFilePath.Parent("tab1",0)
+Gui.Form.cmdBrowse.Create(Button)
+Gui.Form.cmdBrowse.Size(405,375)
+Gui.Form.cmdBrowse.Position(8250,300)
+Gui.Form.cmdBrowse.Parent("tab1",0)
+Gui.Form.cmdBrowse.Caption("^")
+Gui.Form.cmdBrowse.Event(Click,cmdBrowse_Click)
+Gui.Form.cmdUpload.Create(Button)
+Gui.Form.cmdUpload.Size(855,375)
+Gui.Form.cmdUpload.Position(75,825)
+Gui.Form.cmdUpload.Parent("tab1",0)
+Gui.Form.cmdUpload.Caption("Upload")
+Gui.Form.cmdUpload.Event(Click,cmdUpload_Click)
+Gui.Form.lbl1.Create(Label,"Pick export mode:",True,1935,255,0,90,135,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl1.Parent("tab1",1)
+Gui.Form.ddlExportMode.Create(DropDownList)
+Gui.Form.ddlExportMode.Size(3720,330)
+Gui.Form.ddlExportMode.Position(90,360)
+Gui.Form.ddlExportMode.Parent("tab1",1)
+Gui.Form.ddlExportMode.Event(LostFocus,ddlExportMode_LostFocus)
+Gui.Form.cmdExport.Create(Button)
+Gui.Form.cmdExport.Size(855,375)
+Gui.Form.cmdExport.Position(4095,330)
+Gui.Form.cmdExport.Parent("tab1",1)
+Gui.Form.cmdExport.Caption("Export")
+Gui.Form.cmdExport.Event(Click,cmdExport_Click)
+Gui.Form.lbl2.Create(Label,"Browse for upload file:",True,1935,255,0,75,105,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lbl2.Parent("tab1",0)
+Gui.Form.ddlProject.Create(DropDownList)
+Gui.Form.ddlProject.Visible(False)
+Gui.Form.ddlProject.Size(3720,330)
+Gui.Form.ddlProject.Position(105,990)
+Gui.Form.ddlProject.Parent("tab1",1)
+Gui.Form.lblProject.Create(Label,"Select Project:",False,1935,255,0,90,765,True,0,"Arial",8,-2147483633,0)
+Gui.Form.lblProject.Parent("tab1",1)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'		Author: Daniel Duncan
+'		Customer: Global Shop Solutions
+'		Program Name: Import/Export EDI Project Files
+'		Date Started: 11/27/19
+'		Description: Allows the user to export existing projects to XML or load XML files as projects.
+'		Quote: 
+'		GAP: 5523
+	f.Intrinsic.Control.CallSub(CheckTable)
+	Gui.Form.tab1.SetTab(0)
+	gui.Form.ddlExportMode.AddItem("Single Project")
+	gui.Form.ddlExportMode.AddItem("All Projects")
+	f.Intrinsic.Control.CallSub(GetAllProjects)
+	gui.Form..show
+Program.Sub.Main.End
+
+Program.Sub.Form_UnLoad.Start
+	f.Intrinsic.Control.End
+Program.Sub.Form_UnLoad.End
+
+Program.Sub.GetAllProjects.Start
+	f.Intrinsic.Control.Try
+		v.Local.iCnt.Declare(long)
+		f.ODBC.Connection!con.opencompanyconnection
+			f.Data.DataTable.CreateFromSQL("dtProjects","con","select distinct projectname from GCG_5523_EDI_OPTIONS;")
+		f.ODBC.Connection!con.close
+		
+		f.Intrinsic.Control.For(v.Local.iCnt,0,v.DataTable.dtProjects.RowCount--,1)
+			gui.Form.ddlProject.AddItem(v.DataTable.dtProjects(v.Local.iCnt).ProjectName!FieldValTrim)
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.GetAllProjects.End
+
+Program.Sub.ddlExportMode_LostFocus.Start
+	f.Intrinsic.Control.If(v.Screen.Form!ddlExportMode.Value,=,"Single Project")
+		gui.Form.lblProject.Visible(True)
+		gui.Form.ddlProject.Visible(True)
+	f.Intrinsic.Control.Else
+		gui.Form.lblProject.Visible(False)
+		gui.Form.ddlProject.Visible(False)
+	f.Intrinsic.Control.EndIf
+Program.Sub.ddlExportMode_LostFocus.End
+
+Program.Sub.cmdBrowse_Click.Start
+	f.Intrinsic.Control.Try
+		'Windows open file dialog
+		v.Local.sSelectedFileName.Declare(string)
+		
+		F.Intrinsic.UI.ShowOpenFileDialog("", "","524288",v.Local.sSelectedFileName)
+		f.Intrinsic.Control.If(v.Local.sSelectedFileName,!=,"***CANCEL***")
+			gui.Form.txtFilePath.Text(v.Local.sSelectedFileName)
+		F.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.cmdBrowse_Click.End
+
+Program.Sub.ErrorMsg.Start
+v.Local.sError.Declare
+
+'Closes ODBC connection, default to connection : "con"
+f.Intrinsic.Control.If(v.ODBC!con.State, =, 1)
+	f.ODBC.Connection!con.Close
+f.Intrinsic.Control.EndIf
+
+'Generic Error message.
+f.Intrinsic.String.Build("Project GCG_5523_ProjectImportExport.g2u {0}{0}Subroutine: {1}{0}Error: {2} with Description: {3}", v.Ambient.NewLine, v.Args.CurrentSub, v.Ambient.ErrorNumber, v.Ambient.ErrorDescription, v.Local.sError)
+f.Intrinsic.UI.Msgbox(v.Local.sError)
+Program.Sub.ErrorMsg.End
+
+Program.Sub.CheckTable.Start
+	f.Intrinsic.Control.Try
+		v.Local.bExists.Declare(boolean)
+		f.ODBC.Connection!con.opencompanyconnection
+			f.ODBC.Connection!con.TableExists("GCG_5523_EDI_OPTIONS",V.Local.bExists)
+		f.ODBC.Connection!con.close
+		
+		f.Intrinsic.Control.If(v.Local.bExists,=,False)
+			f.Intrinsic.UI.Msgbox("Project must first be initiated before this option can be run.  Make sure at least one profile is present first.","Error")
+			f.Intrinsic.Control.End
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.CheckTable.End
+
+Program.Sub.cmdUpload_Click.Start
+	f.Intrinsic.Control.Try
+		v.Local.bExists.Declare(boolean)
+		
+		'Make sure a file is selected, that the file exists, and the file is XML
+		f.Intrinsic.Control.If(v.Screen.Form!txtFilePath.text,=,"")
+			f.Intrinsic.UI.Msgbox("File must be selected for import to occur.","Error")
+			f.Intrinsic.Control.ExitSub
+		f.Intrinsic.Control.EndIf
+		f.Intrinsic.File.Exists(v.Screen.Form!txtFilePath.text,v.Local.bExists)
+		f.Intrinsic.Control.If(v.Local.bExists,=,False)
+			f.Intrinsic.UI.Msgbox("File selected does not exist.  Please select an existing file.","Error")
+			f.Intrinsic.Control.ExitSub
+		f.Intrinsic.Control.EndIf
+		'User feedback
+		f.Intrinsic.UI.InvokeWaitDialog("Importing EDI project(s)","GCG 5523")
+		'Read in the XML into the datatable
+		f.Data.DataTable.CreateFromXML("dtProfile",v.Screen.Form!txtFilePath.text)
+		f.Intrinsic.Control.If(v.DataTable.dtProfile.RowCount,>,0)
+			'Save to the database
+			f.ODBC.Connection!con.opencompanyconnection
+				f.Data.DataTable.SaveTodb("dtProfile","con","GCG_5523_EDI_OPTIONS","FieldTitle*!*ProjectName",256)
+			f.ODBC.Connection!con.close
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.Finally
+		f.Intrinsic.UI.CloseWaitDialog
+	f.Intrinsic.Control.EndTry
+Program.Sub.cmdUpload_Click.End
+
+Program.Sub.cmdExport_Click.Start
+	f.Intrinsic.Control.Try
+		v.Local.sSQL.Declare(string,"select * from GCG_5523_EDI_OPTIONS")
+		v.Local.sFilePath.Declare(string)
+		
+		'Make sure an export type is selected
+		f.Intrinsic.Control.If(v.Screen.Form!ddlExportMode.Value,=,"")
+			f.Intrinsic.UI.Msgbox("Export mode must be selected for export to occur.","Error")
+			f.Intrinsic.Control.ExitSub
+		f.Intrinsic.Control.EndIf
+		'User feedback
+		f.Intrinsic.UI.InvokeWaitDialog("Exporting EDI project(s)","GCG 5523")
+		'If Single Project is export type, make sure a project is selected
+		f.Intrinsic.Control.If(v.Screen.Form!ddlExportMode.Value,=,"Single Project")
+			f.Intrinsic.Control.If(v.Screen.Form!ddlProject.Value,=,"")
+				f.Intrinsic.UI.Msgbox("Project must be selected for export to occur.","Error")
+				f.Intrinsic.UI.CloseWaitDialog
+				f.Intrinsic.Control.ExitSub
+			f.Intrinsic.Control.EndIf
+			
+			f.Intrinsic.String.Build("{0} where ProjectName='{1}'",v.Local.sSQL,v.Screen.Form!ddlProject.Value,v.Local.sSQL)
+		f.Intrinsic.Control.EndIf
+		'Load data into datatable
+		f.ODBC.Connection!con.opencompanyconnection
+			f.Data.DataTable.CreateFromSQL("dtProfile","con",v.Local.sSQL)
+		f.ODBC.Connection!con.close
+		'Set the export file path
+		f.Intrinsic.String.Build("{0}\EDIExport.xml",v.Caller.LocalGSSTempDir,v.Local.sFilePath)
+		'Export datatable into XML
+		f.Data.DataTable.SaveToXML("dtProfile",0,True,v.Local.sFilePath)
+		'Open the file folder
+		f.Intrinsic.Task.ShellExec(handle, "open",v.Caller.LocalGSSTempDir,"","", 0)
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.Finally
+		f.Intrinsic.UI.CloseWaitDialog
+	f.Intrinsic.Control.EndTry	
+Program.Sub.cmdExport_Click.End
