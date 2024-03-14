@@ -1,0 +1,2273 @@
+﻿Program.Sub.Preflight.Start
+v.Global.sCsvLocFile.Declare
+v.Global.sEdiDestFolder.Declare
+v.Global.sProject.Declare
+v.Global.sProfile.Declare
+v.Global.sProfile.Set("Profile1")
+
+'Format and Option Variables.
+v.Global.sHeaderGrouping.Declare
+v.Global.sLineGrouping.Declare
+v.Global.bMultipleLineOrder.Declare
+v.Global.sDateFormat.Declare
+
+v.Global.sLineSorting.Declare
+
+v.Global.iHeaderA.Declare
+v.Global.iHeaderB.Declare
+v.Global.iHeaderC.Declare
+v.Global.iHeaderN.Declare
+
+v.Global.iLine1.Declare
+v.Global.iLine2.Declare
+v.Global.iLineN.Declare
+
+'Name Variables.
+v.Global.iProjectNameOption.Declare
+v.Global.iUser.Declare
+v.Global.iTerminal.Declare
+v.Global.iDate.Declare
+v.Global.iTimeStamp.Declare
+v.Global.sFileName.Declare
+
+v.Global.iShipM.Declare
+'Text Global Variables.
+v.Global.sEDI_Text.Declare
+v.Global.sDataviewFilter.Declare
+v.Global.sDateTitle.Declare
+v.Global.sPO_Column.Declare
+
+v.Global.iRowTitle.Declare
+Program.Sub.Preflight.End
+
+'Author: Alejandro Anazco Villarreal
+'Customer: Global Shop
+'Program Name: Edi Format 1
+'Date Started: 3/1/2019
+'Description: Description
+
+Program.Sub.Main.Start
+'first format.
+'read csv file.
+'Converts the file to EDI.
+'the uploadscreen will collect csv location, edi destination and call the format script. Check if the EDI file was created and shows successful message.
+
+v.Local.bLicense.Declare
+f.Global.General.ISLICENSEDBYMODULENAME("EDI", v.Local.bLicense)
+f.Intrinsic.Control.If(v.Local.bLicense, =, false)
+	f.Intrinsic.UI.Msgbox("No EDI License found. Please contact your Account Rep.")
+	f.Intrinsic.Control.End
+f.Intrinsic.Control.EndIf
+
+v.Global.sProfile.Set("Standard")
+
+f.Intrinsic.Control.CallSub(loadGlobalVariables)
+f.Intrinsic.Control.CallSub(loadProject)
+f.Intrinsic.Control.CallSub(loadCSV)
+f.Intrinsic.Control.CallSub(readProjectOptions)
+
+f.Intrinsic.Control.CallSub(createMatching)
+f.Intrinsic.Control.CallSub(getDateHeaders)
+
+f.Intrinsic.Control.CallSub(writeEDI)
+'This script will receive as passed variables: 
+'csv location, edi destination done
+'read csv done
+'read Options done
+'write EDI
+'create EDI File.
+Program.Sub.Main.End
+
+Program.Sub.ErrorMsg.Start
+v.Local.sError.Declare
+
+'Closes ODBC connection, default to connection : "con"
+'f.Intrinsic.Control.If(v.ODBC!con.State, =, 1)
+'	f.ODBC.Connection!con.Close
+'f.Intrinsic.Control.EndIf
+
+'Generic Error message.
+f.Intrinsic.String.Build("Project GCG_5523_Profile1_Standard.g2u {0}{0}Subroutine: {1}{0}Error: {2} with Description: {3}", v.Ambient.NewLine, v.Args.CurrentSub, v.Ambient.ErrorNumber, v.Ambient.ErrorDescription, v.Local.sError)
+f.Intrinsic.UI.Msgbox(v.Local.sError)
+Program.Sub.ErrorMsg.End
+
+Program.Sub.loadGlobalVariables.Start
+v.Local.sSQL.Declare
+f.Intrinsic.Control.Try
+'Getting the record from GCG_5523_PROFILES Table. Records with 'R' are master records for reading only. Record with 'W' are created by the input script with the variables needed for the program to run, should be deleted at the end.
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Intrinsic.String.Build("select * from GCG_5523_PROFILES where ProfileName = '{0}' and RecordType = 'W' and GssUsername = '{1}' and Terminal = '{2}'", v.Global.sProfile, v.Caller.User, v.Caller.Terminal, v.Local.sSQL)
+		f.Data.DataTable.CreateFromSQL("ediProfileDT", "con", v.Local.sSQL)
+	f.ODBC.Connection!con.Close	
+	'If theres one record 'W', set the global variables. If theres no records means the inputScript didn't work properly and if there's multiple means the formatScript is not deleting record 'W'
+	f.Intrinsic.Control.If(v.DataTable.ediProfileDT.RowCount, =, 1)
+		v.Global.sCsvLocFile.Set(v.DataTable.ediProfileDT(0).CSV_LocFile!FieldValTrim)
+		v.Global.sEdiDestFolder.Set(v.DataTable.ediProfileDT(0).EDI_DestFolder!FieldValTrim)
+		v.Global.sProject.Set(v.DataTable.ediProfileDT(0).ProjectToUse!FieldValTrim)
+	f.Intrinsic.Control.ElseIf(v.DataTable.ediProfileDT.RowCount, =, 0)
+		f.Intrinsic.UI.Msgbox("No Record Found, Please Try Again.")
+		f.Intrinsic.Control.End
+	f.Intrinsic.Control.ElseIf(v.DataTable.ediProfileDT.RowCount, >, 1)
+		f.Intrinsic.UI.Msgbox("Multiple Records Found, Please Review PSQL Records.")
+		f.Intrinsic.Control.End
+	f.Intrinsic.Control.EndIf
+	'Once the global variables are set, there's no more need for this table.
+	f.Data.DataTable.Close("ediProfileDT")
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.loadGlobalVariables.End
+
+Program.Sub.loadProject.Start
+v.Local.sSQL.Declare
+f.Intrinsic.Control.Try
+	'gettin the profile specified in Record 'W' 
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Intrinsic.String.Build("select * from GCG_5523_EDI_OPTIONS where PROJECTNAME = '{0}' order by ORDERID asc", v.Global.sProject, v.Local.sSQL)
+		f.Data.DataTable.CreateFromSQL("ediProfileDT", "con", v.Local.sSQL, true)
+	f.ODBC.Connection!con.Close	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.loadProject.End
+
+Program.Sub.loadCSV.Start
+v.Local.sRet.Declare
+v.Local.sRetLines.Declare
+v.Local.sRetColumns.Declare
+v.Local.sColumntitle.Declare
+v.Local.sColumnType.Declare
+v.Local.sTemptitles.Declare
+v.Local.sTempTypes.Declare
+v.Local.iCnt.Declare
+v.Local.sTemptitleSingle.Declare
+
+v.Local.bExcelExist.Declare
+
+f.Intrinsic.Control.Try
+	
+	f.Automation.MSExcel.CheckPresence(v.Local.bExcelExist)
+	
+	f.Intrinsic.Control.If(v.Local.bExcelExist)
+	f.Intrinsic.Control.EndIf
+	'The program will read a CSV file. Usually csv files will separate lines with new lines. if it doesn't it can be read with Excel Automation (Needs Excel to be installed.). One solution is also not attempting to open the CSV files before running the program.
+	f.Intrinsic.File.File2String(v.Global.sCsvLocFile, v.Local.sRet)
+	f.Intrinsic.String.Split(v.Local.sRet, v.Ambient.NewLine, v.Local.sRetLines)
+	f.Intrinsic.Control.If(v.Local.sRetLines.UBound, >, 0)
+		f.Intrinsic.String.SplitCSV(v.Local.sRetLines(0), v.Local.sRetColumns)
+		
+		v.Local.sTemptitles.RedimPreserve(0, v.Local.sRetColumns.UBound)
+		v.Local.sTempTypes.RedimPreserve(0, v.Local.sRetColumns.UBound)
+		f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.sRetColumns.UBound, 1)
+'			f.Intrinsic.String.Build("Field{0}Test", v.Local.iCnt, v.Local.sTemptitleSingle)
+'			v.Local.sTemptitles(v.Local.iCnt).Set(v.Local.sTemptitleSingle)
+			f.Intrinsic.String.Build("H{0}", v.Local.iCnt, v.Local.sTemptitles(v.Local.iCnt))
+			'v.Local.sTemptitles(v.Local.iCnt).Set(v.Local.iCnt)
+			v.Local.sTempTypes(v.Local.iCnt).Set("String")
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+		
+		f.Intrinsic.String.Join(v.Local.sTemptitles, "*!*", v.Local.sColumntitle)
+		f.Intrinsic.String.Join(v.Local.sTempTypes, "*!*", v.Local.sColumnType)
+
+		f.Data.DataTable.CreateFromCSV("csvUploadDT", v.Global.sCsvLocFile, v.Local.sColumntitle,  v.Local.sColumnType, true)
+		
+		f.Data.DataTable.DeleteRow("csvUploadDT", 0)
+		'f.Data.DataTable.CreateFromString("csvUpload", v.Local.sRet, v.Local.sColumntitle, v.Local.sColumnType, ",", v.Ambient.NewLine, true)
+	f.Intrinsic.Control.Else		
+	'If there's need to read using MSExcel, we need to split the data in a different way.
+		f.Automation.MSExcel.ReadSpreadsheet(v.Global.sCsvLocFile, v.Local.sRet)
+		f.Intrinsic.String.Split(v.Local.sRet, "$!$", v.Local.sRetLines)
+		f.Intrinsic.String.Split(v.Local.sRetLines(0),"*!*", v.Local.sRetColumns)
+		
+		f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.sRetColumns.UBound, 1)
+			f.Intrinsic.String.Build("H{0}", v.Local.iCnt, v.Local.sTemptitles(v.Local.iCnt))
+			'v.Local.sTemptitles(v.Local.iCnt).Set(v.Local.iCnt)
+			v.Local.sTempTypes(v.Local.iCnt).Set("String")
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+		
+		f.Intrinsic.String.JoinCSV(v.Local.sTemptitles, true, v.Local.sColumntitle)
+		f.Intrinsic.String.JoinCSV(v.Local.sTempTypes, true, v.Local.sColumnType)
+		
+		f.Data.DataTable.CreateFromString("csvUploadDT", v.Local.sRet, v.Local.sColumntitle, v.Local.sColumnType, "*!*", "$!$", true)
+		f.Data.DataTable.DeleteRow("csvUploadDT", 0)
+		
+	f.Intrinsic.Control.EndIf	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.loadCSV.End
+
+Program.Sub.readProjectOptions.Start
+v.Local.sFilter.Declare
+v.Local.sTemp.Declare
+v.Local.sRet.Declare
+v.Local.iCnt.Declare
+v.Local.sProjectName.Declare
+
+v.Local.sSort.Declare
+v.Local.sGroup.Declare
+f.Intrinsic.Control.Try
+'Read Name Format 
+	v.Local.sProjectName.Set(v.DataTable.ediProfileDT(0).FieldValue!FieldValTrim)
+	v.Global.iProjectNameOption.Set(v.DataTable.ediProfileDT(4).FieldValue!FieldValTrim)
+	v.Global.iUser.Set(v.DataTable.ediProfileDT(5).FieldValue!FieldValTrim)
+	v.Global.iTerminal.Set(v.DataTable.ediProfileDT(6).FieldValue!FieldValTrim)
+	v.Global.iDate.Set(v.DataTable.ediProfileDT(7).FieldValue!FieldValTrim)
+	v.Global.iTimeStamp.Set(v.DataTable.ediProfileDT(8).FieldValue!FieldValTrim)
+	v.Global.sFileName.Set("EA850")
+	
+	f.Intrinsic.Control.If(v.Global.iProjectNameOption, =, 1)
+		f.Intrinsic.String.Build("{0}_{1}", v.Global.sFileName, v.Local.sProjectName, v.Global.sFileName)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Global.iUser, =, 1)
+		f.Intrinsic.String.Build("{0}_{1}", v.Global.sFileName, v.Caller.User, v.Global.sFileName)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Global.iTerminal, =, 1)
+		f.Intrinsic.String.Build("{0}_{1}", v.Global.sFileName, v.Caller.Terminal, v.Global.sFileName)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Global.iDate, =, 1)
+		f.Intrinsic.String.Build("{0}_{1}", v.Global.sFileName, v.Ambient.Date.PervasiveDate, v.Global.sFileName)
+	f.Intrinsic.Control.EndIf
+
+	f.Intrinsic.Control.If(v.Global.iTimeStamp, =, 1)
+		f.Intrinsic.String.Build("{0}_{1}", v.Global.sFileName, v.Ambient.Time, v.Global.sFileName)
+		f.Intrinsic.String.Replace(v.Global.sFileName, ":", "-", v.Global.sFileName)
+	f.Intrinsic.Control.EndIf
+	
+'Read Header Grouping
+	v.Local.sTemp.Redim(0,3)
+	v.Local.iCnt.Set(0)
+
+	'H-Buyer-ID
+	f.Intrinsic.Control.If(v.DataTable.ediProfileDT(9).FieldValue!FieldValTrim, =, "1")
+		v.Local.sTemp(v.Local.iCnt).Set(v.DataTable.ediProfileDT(27).FieldValue!FieldValTrim)
+		f.Intrinsic.String.Build("H{0}",v.Local.sTemp(v.Local.iCnt), v.Local.sTemp(v.Local.iCnt))
+		
+		f.Intrinsic.Control.If(v.Local.sSort.Trim, =, "")
+			v.Local.sSort.Set(v.Local.sTemp(v.Local.iCnt))
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("{0},{1}", v.Local.sSort, v.Local.sTemp(v.Local.iCnt), v.Local.sSort)
+		f.Intrinsic.Control.EndIf
+		
+		f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+		
+	f.Intrinsic.Control.EndIf
+	'H-PO-Number
+	f.Intrinsic.Control.If(v.DataTable.ediProfileDT(10).FieldValue!FieldValTrim, =, "1")
+		v.Local.sTemp(v.Local.iCnt).Set(v.DataTable.ediProfileDT(28).FieldValue!FieldValTrim)
+		f.Intrinsic.String.Build("H{0}",v.Local.sTemp(v.Local.iCnt), v.Local.sTemp(v.Local.iCnt))
+		v.Global.sPO_Column.Set(v.Local.sTemp(v.Local.iCnt))
+		
+		f.Intrinsic.Control.If(v.Local.sSort.Trim, =, "")
+			v.Local.sSort.Set(v.Local.sTemp(v.Local.iCnt))
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("{0},{1}", v.Local.sSort, v.Local.sTemp(v.Local.iCnt), v.Local.sSort)
+		f.Intrinsic.Control.EndIf
+		
+		f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	'H-Ship-To
+	f.Intrinsic.Control.If(v.DataTable.ediProfileDT(11).FieldValue!FieldValTrim, =, "1")
+		f.Intrinsic.String.RPad("H-SHIP-TO-CODE", " ", 25, v.Local.sRet)
+		f.Intrinsic.String.Build("Fieldtitle = '{0}'", v.Local.sRet, v.Local.sRet)
+		f.Data.DataView.Create("ediProfileDT", "singleShipToDV", 22, v.Local.sRet, "")
+			f.Intrinsic.Control.If(v.DataView.ediProfileDT!singleShipToDV.RowCount, =, 1)
+				v.Local.sTemp(v.Local.iCnt).Set(v.DataView.ediProfileDT!singleShipToDV(0).FieldValue!FieldValTrim)
+				f.Intrinsic.String.Build("H{0}",v.Local.sTemp(v.Local.iCnt), v.Local.sTemp(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.Else
+				v.Local.sTemp.Set("")
+			f.Intrinsic.Control.EndIf
+		f.Data.DataView.Close("ediProfileDT", "singleShipToDV")
+		'f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	'*********************************************************
+	'M-Due-Date
+	f.Intrinsic.Control.If(v.DataTable.ediProfileDT(12).FieldValue!FieldValTrim, =, "1")
+		f.Intrinsic.String.RPad("H-SHIP-DATE-CCYYMMDD", " ", 25, v.Local.sRet)
+		f.Intrinsic.String.Build("Fieldtitle = '{0}'", v.Local.sRet, v.Local.sRet)
+		f.Data.DataView.Create("ediProfileDT", "singleShipToDV", 22, v.Local.sRet, "")
+			f.Intrinsic.Control.If(v.DataView.ediProfileDT!singleShipToDV.RowCount, =, 1)
+				v.Local.sTemp(v.Local.iCnt).Set(v.DataView.ediProfileDT!singleShipToDV(0).FieldValue!FieldValTrim)
+				f.Intrinsic.String.Build("H{0}",v.Local.sTemp(v.Local.iCnt), v.Local.sTemp(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.Else
+				v.Local.sTemp.Set("")
+			f.Intrinsic.Control.EndIf
+		f.Data.DataView.Close("ediProfileDT", "singleShipToDV")
+		'f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	
+	f.Intrinsic.Control.If(v.Local.iCnt, >, 0)
+		f.Intrinsic.Math.Sub(v.Local.iCnt, 1, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	v.Local.sTemp.RedimPreserve(0,  v.Local.iCnt)
+	f.Intrinsic.String.Join(v.Local.sTemp, "*!*", v.Global.sHeaderGrouping)	
+	
+'Read Line Grouping
+	v.Local.sTemp.Redim(0,2)
+	v.Local.iCnt.Set(0)
+	
+	'L_PO_Line_Nbr
+	f.Intrinsic.Control.If(v.DataTable.ediProfileDT(14).FieldValue!FieldValTrim, =, "1")
+		f.Intrinsic.String.RPad("L-PO-LINE-NUM", " ", 25, v.Local.sRet)
+		f.Intrinsic.String.Build("Fieldtitle = '{0}'", v.Local.sRet, v.Local.sRet)
+		f.Data.DataView.Create("ediProfileDT", "singleLineNbrDV", 22, v.Local.sRet, "")
+			f.Intrinsic.Control.If(v.DataView.ediProfileDT!singleLineNbrDV.RowCount, =, 1)
+				v.Local.sTemp(v.Local.iCnt).Set(v.DataView.ediProfileDT!singleLineNbrDV(0).FieldValue!FieldValTrim)
+				f.Intrinsic.String.Build("H{0}",v.Local.sTemp(v.Local.iCnt), v.Local.sTemp(v.Local.iCnt))			
+				'f.Intrinsic.String.Build("{0} asc", v.Local.sTemp(v.Local.iCnt), v.Global.sLineSorting)
+				
+				f.Intrinsic.Control.If(v.Local.sSort.Trim, =, "")
+					v.Local.sSort.Set(v.Local.sTemp(v.Local.iCnt))
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.Build("{0},{1}", v.Local.sSort, v.Local.sTemp(v.Local.iCnt), v.Local.sSort)
+				f.Intrinsic.Control.EndIf
+				
+				f.Intrinsic.Control.If(v.Local.sGroup.Trim, =, "")
+					v.Local.sGroup.Set(v.Local.sTemp(v.Local.iCnt))
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.Build("{0}*!*{1}", v.Local.sGroup, v.Local.sTemp(v.Local.iCnt), v.Local.sGroup)
+				f.Intrinsic.Control.EndIf
+				
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.Else
+				v.Local.sTemp.Set("")
+			f.Intrinsic.Control.EndIf
+		f.Data.DataView.Close("ediProfileDT", "singleLineNbrDV")
+		'f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	'L-Part-Number
+	f.Intrinsic.Control.If(v.DataTable.ediProfileDT(13).FieldValue!FieldValTrim, =, "1")
+		f.Intrinsic.String.RPad("L-BUYER-PART-NUM", " ", 25, v.Local.sRet)
+		f.Intrinsic.String.Build("Fieldtitle = '{0}'", v.Local.sRet, v.Local.sRet)
+		f.Data.DataView.Create("ediProfileDT", "singlePartNumDV", 22, v.Local.sRet, "")
+			f.Intrinsic.Control.If(v.DataView.ediProfileDT!singlePartNumDV.RowCount, =, 1)
+				v.Local.sTemp(v.Local.iCnt).Set(v.DataView.ediProfileDT!singlePartNumDV(0).FieldValue!FieldValTrim)
+				f.Intrinsic.String.Build("H{0}",v.Local.sTemp(v.Local.iCnt), v.Local.sTemp(v.Local.iCnt))
+				
+				f.Intrinsic.Control.If(v.Local.sSort.Trim, =, "")
+					v.Local.sSort.Set(v.Local.sTemp(v.Local.iCnt))
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.Build("{0},{1}", v.Local.sSort, v.Local.sTemp(v.Local.iCnt), v.Local.sSort)
+				f.Intrinsic.Control.EndIf
+				
+				f.Intrinsic.Control.If(v.Local.sGroup.Trim, =, "")
+					v.Local.sGroup.Set(v.Local.sTemp(v.Local.iCnt))
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.Build("{0}*!*{1}", v.Local.sGroup, v.Local.sTemp(v.Local.iCnt), v.Local.sGroup)
+				f.Intrinsic.Control.EndIf
+		
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.Else
+				v.Local.sTemp.Set("")
+			f.Intrinsic.Control.EndIf
+		f.Data.DataView.Close("ediProfileDT", "singlePartNumDV")
+		'f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	'L_User1
+	f.Intrinsic.Control.If(v.DataTable.ediProfileDT(15).FieldValue!FieldValTrim, =, "1")
+		f.Intrinsic.String.RPad("L-USER1", " ", 25, v.Local.sRet)
+		f.Intrinsic.String.Build("Fieldtitle = '{0}'", v.Local.sRet, v.Local.sRet)
+		f.Data.DataView.Create("ediProfileDT", "singleLineNbrDV", 22, v.Local.sRet, "")
+			f.Intrinsic.Control.If(v.DataView.ediProfileDT!singleLineNbrDV.RowCount, =, 1)
+				v.Local.sTemp(v.Local.iCnt).Set(v.DataView.ediProfileDT!singleLineNbrDV(0).FieldValue!FieldValTrim)
+				f.Intrinsic.String.Build("H{0}",v.Local.sTemp(v.Local.iCnt), v.Local.sTemp(v.Local.iCnt))
+				
+				f.Intrinsic.Control.If(v.Local.sSort.Trim, =, "")
+					v.Local.sSort.Set(v.Local.sTemp(v.Local.iCnt))
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.Build("{0},{1}", v.Local.sSort, v.Local.sTemp(v.Local.iCnt), v.Local.sSort)
+				f.Intrinsic.Control.EndIf
+				
+				f.Intrinsic.Control.If(v.Local.sGroup.Trim, =, "")
+					v.Local.sGroup.Set(v.Local.sTemp(v.Local.iCnt))
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.Build("{0}*!*{1}", v.Local.sGroup, v.Local.sTemp(v.Local.iCnt), v.Local.sGroup)
+				f.Intrinsic.Control.EndIf
+				
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.Else
+				v.Local.sTemp.Set("")
+			f.Intrinsic.Control.EndIf
+		f.Data.DataView.Close("ediProfileDT", "singleLineNbrDV")
+		'f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	
+	f.Intrinsic.Control.If(v.Local.iCnt, >, 0)
+		f.Intrinsic.Math.Sub(v.Local.iCnt, 1, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	v.Local.sTemp.RedimPreserve(0,  v.Local.iCnt)
+	'f.Intrinsic.String.RemoveArrayDuplicates()
+	'f.Intrinsic.String.Join(v.Local.sTemp, "*!*", v.Global.sLineGrouping)
+	
+	f.Intrinsic.Control.If(v.Local.sGroup.Trim, <>, "")
+		v.Global.sLineGrouping.Set(v.Local.sGroup)
+	f.Intrinsic.Control.Else
+		v.Global.sLineGrouping.Set("")
+	f.Intrinsic.Control.EndIf
+	
+	'f.Intrinsic.String.Join(v.Local.sTemp, ",", v.Global.sLineSorting)
+	f.Intrinsic.Control.If(v.Local.sSort.Trim, <>, "")
+		f.Intrinsic.String.Build("{0} asc",  v.Local.sSort, v.Global.sLineSorting)
+	f.Intrinsic.Control.Else
+		v.Global.sLineSorting.Set("")
+	f.Intrinsic.Control.EndIf
+	
+'Read Date Format
+	v.Global.sDateFormat.Set(v.DataTable.ediProfileDT(16).FieldValue!FieldValTrim)
+
+'Line
+	v.Global.iHeaderA.Set(v.DataTable.ediProfileDT(17).FieldValue!FieldValTrim)
+	v.Global.iHeaderB.Set(v.DataTable.ediProfileDT(18).FieldValue!FieldValTrim)
+	v.Global.iHeaderC.Set(v.DataTable.ediProfileDT(19).FieldValue!FieldValTrim)
+	v.Global.iHeaderN.Set(v.DataTable.ediProfileDT(20).FieldValue!FieldValTrim)
+	v.Global.iLine1.Set(v.DataTable.ediProfileDT(21).FieldValue!FieldValTrim)
+	v.Global.iLine2.Set(v.DataTable.ediProfileDT(22).FieldValue!FieldValTrim)
+	v.Global.iLineN.Set(v.DataTable.ediProfileDT(23).FieldValue!FieldValTrim)
+	v.Global.iShipM.Set(v.DataTable.ediProfileDT(24).FieldValue!FieldValTrim)
+	
+'First Row
+	v.Global.iRowTitle.Set(v.DataTable.ediProfileDT(25).FieldValue!FieldValTrim)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.readProjectOptions.End
+
+Program.Sub.createMatching.Start
+v.Local.iCnt.Declare
+v.Local.sTemp.Declare
+f.Intrinsic.Control.Try
+	f.Data.DataView.Create("ediProfileDT", "ediProfileDV", 22, "OrderID > '24'", "OrderID")
+	f.Data.DataView.ToDataTable("ediProfileDT", "ediProfileDV", "joinDT")
+	
+	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.DataTable.joinDT.RowCount--, 1)
+		v.Local.sTemp.Set(v.DataTable.joinDT(v.Local.iCnt).FieldValue!FieldVal)
+		f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+			f.Intrinsic.String.Build("H{0}", v.Local.sTemp, v.Local.sTemp)
+			f.Data.DataTable.SetValue("joinDT", v.Local.iCnt, "FieldValue", v.Local.sTemp)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.Next(v.Local.iCnt)
+	
+	f.Data.Dictionary.CreateFromDataTable("fieldValueDictionary", "joinDT", "FieldtitleID", "FieldValue")
+	
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("columntitlesDT", "con", "Select Fieldtitle, FieldtitleID from GCG_5523_FIELDS_INFO order by FieldtitleID", true)
+	f.ODBC.Connection!con.Close	
+	f.Data.DataTable.AddColumn("columntitlesDT", "FieldValue", "String")
+	
+	f.Data.Dictionary.SetDefaultReturn("fieldValueDictionary", "")
+	f.Data.DataTable.FillFromDictionary("columntitlesDT", "fieldValueDictionary", "FieldtitleID", "FieldValue")
+	'combining the values I get from the profile into my Built EDI Fieldtitles. Keeping EDI Field titles and matching the profile values.
+	'f.Data.Linq.Join("LeftJoin", "datatable", "ediFieldtitlesDT*!*E", "datatable", "joinDT*!*P", "E.FieldtitleID= P.FieldtitleID", "E.Fieldtitle*!*P.FieldValue", "","","", "columntitlesDT", true)
+	'f.Data.Linq.Join("LeftJoin", "datatable", "ediFieldtitlesDT*!*E", "datatable", "joinDT*!*P", "E.FieldtitleID*!*P.FieldtitleID", "E.Fieldtitle*!*P.FieldValue*!*E.FieldtitleID", "", "", "E.FieldtitleID", "columntitlesDT", true)
+	f.Data.DataView.Close("ediProfileDT", "ediProfileDV")
+	f.Data.DataTable.Close("joinDT")
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.createMatching.End
+
+Program.Sub.getDateHeaders.Start
+v.Local.sTemp.Declare
+v.Local.iCnt.Declare
+v.Local.sCharTest.Declare
+v.Local.iLenght.Declare
+v.Local.sTitles.Declare
+
+f.Intrinsic.Control.Try
+
+	v.Local.iCnt.Set(0)
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(4).FieldValue!FieldValTrim, =!, "")	
+		v.Local.sTemp.Set(v.DataTable.columntitlesDT(4).FieldValue!FieldValTrim)
+		f.Intrinsic.Math.Sub(v.Local.sTemp.Length, 1, v.Local.iLenght)
+		f.Intrinsic.String.Left(v.Local.sTemp, 1, v.Local.sCharTest)
+		f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+			f.Intrinsic.String.Right(v.Local.sTemp, v.Local.iLenght, v.Local.sTemp)
+			f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+				v.Local.sTitles.RedimPreserve(0, v.Local.iCnt)
+				f.Intrinsic.String.Build("H{0}", v.Local.sTemp, v.Local.sTitles(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf		
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(5).FieldValue!FieldValTrim, =!, "")	
+		v.Local.sTemp.Set(v.DataTable.columntitlesDT(5).FieldValue!FieldValTrim)
+		f.Intrinsic.Math.Sub(v.Local.sTemp.Length, 1, v.Local.iLenght)
+		f.Intrinsic.String.Left(v.Local.sTemp, 1, v.Local.sCharTest)
+		f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+			f.Intrinsic.String.Right(v.Local.sTemp, v.Local.iLenght, v.Local.sTemp)
+			f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+				v.Local.sTitles.RedimPreserve(0, v.Local.iCnt)
+				f.Intrinsic.String.Build("H{0}", v.Local.sTemp, v.Local.sTitles(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf		
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(93).FieldValue!FieldValTrim, =!, "")	
+		v.Local.sTemp.Set(v.DataTable.columntitlesDT(93).FieldValue!FieldValTrim)
+		f.Intrinsic.Math.Sub(v.Local.sTemp.Length, 1, v.Local.iLenght)
+		f.Intrinsic.String.Left(v.Local.sTemp, 1, v.Local.sCharTest)
+		f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+			f.Intrinsic.String.Right(v.Local.sTemp, v.Local.iLenght, v.Local.sTemp)
+			f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+				v.Local.sTitles.RedimPreserve(0, v.Local.iCnt)
+				f.Intrinsic.String.Build("H{0}", v.Local.sTemp, v.Local.sTitles(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf		
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(99).FieldValue!FieldValTrim, =!, "")	
+		v.Local.sTemp.Set(v.DataTable.columntitlesDT(99).FieldValue!FieldValTrim)
+		f.Intrinsic.Math.Sub(v.Local.sTemp.Length, 1, v.Local.iLenght)
+		f.Intrinsic.String.Left(v.Local.sTemp, 1, v.Local.sCharTest)
+		f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+			f.Intrinsic.String.Right(v.Local.sTemp, v.Local.iLenght, v.Local.sTemp)
+			f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+				v.Local.sTitles.RedimPreserve(0, v.Local.iCnt)
+				f.Intrinsic.String.Build("H{0}", v.Local.sTemp, v.Local.sTitles(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf		
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(112).FieldValue!FieldValTrim, =!, "")	
+		v.Local.sTemp.Set(v.DataTable.columntitlesDT(112).FieldValue!FieldValTrim)
+		f.Intrinsic.Math.Sub(v.Local.sTemp.Length, 1, v.Local.iLenght)
+		f.Intrinsic.String.Left(v.Local.sTemp, 1, v.Local.sCharTest)
+		f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+			f.Intrinsic.String.Right(v.Local.sTemp, v.Local.iLenght, v.Local.sTemp)
+			f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+				v.Local.sTitles.RedimPreserve(0, v.Local.iCnt)
+				f.Intrinsic.String.Build("H{0}", v.Local.sTemp, v.Local.sTitles(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf		
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(134).FieldValue!FieldValTrim, =!, "")	
+		v.Local.sTemp.Set(v.DataTable.columntitlesDT(134).FieldValue!FieldValTrim)
+		f.Intrinsic.Math.Sub(v.Local.sTemp.Length, 1, v.Local.iLenght)
+		f.Intrinsic.String.Left(v.Local.sTemp, 1, v.Local.sCharTest)
+		f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+			f.Intrinsic.String.Right(v.Local.sTemp, v.Local.iLenght, v.Local.sTemp)
+			f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+				v.Local.sTitles.RedimPreserve(0, v.Local.iCnt)
+				f.Intrinsic.String.Build("H{0}", v.Local.sTemp, v.Local.sTitles(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf		
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(135).FieldValue!FieldValTrim, =!, "")	
+		v.Local.sTemp.Set(v.DataTable.columntitlesDT(135).FieldValue!FieldValTrim)
+		f.Intrinsic.Math.Sub(v.Local.sTemp.Length, 1, v.Local.iLenght)
+		f.Intrinsic.String.Left(v.Local.sTemp, 1, v.Local.sCharTest)
+		f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+			f.Intrinsic.String.Right(v.Local.sTemp, v.Local.iLenght, v.Local.sTemp)
+			f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+				v.Local.sTitles.RedimPreserve(0, v.Local.iCnt)
+				f.Intrinsic.String.Build("H{0}", v.Local.sTemp, v.Local.sTitles(v.Local.iCnt))
+				f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf		
+	f.Intrinsic.Control.EndIf
+	v.Local.sTitles.RedimPreserve(0, v.Local.sTitles.UBound)
+	Function.Intrinsic.String.RemoveArrayDuplicates(v.Local.sTitles,  v.Local.sTitles)
+	
+'	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.sTitles.UBound, 1)
+'		f.Intrinsic.Control.CallSub(formatColumnsDate, passedTitle, v.Local.sTitles(v.Local.iCnt))
+'	f.Intrinsic.Control.Next(v.Local.iCnt)
+	
+	f.Intrinsic.String.Join(v.Local.sTitles, "*!*", v.Global.sDateTitle)
+	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.getDateHeaders.End
+
+Program.Sub.formatColumnsDate.Start
+v.Local.sTemp.Declare
+v.Local.iCnt.Declare
+f.Intrinsic.Control.Try
+
+	f.Intrinsic.Control.If(v.Global.sDateFormat.Trim, =, "1")
+		f.Data.DataTable.SetValueFormat("csvUploadDT", -1, v.Args.passedTitle, v.Args.passedTitle, "YYYYMMDD")
+	f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "2")
+		f.Data.DataTable.SetValueFormat("csvUploadDT", -1, v.Args.passedTitle, v.Args.passedTitle, "YYYYMMDD")
+	f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "3")
+		f.Data.DataTable.SetValueFormat("csvUploadDT", -1, v.Args.passedTitle, v.Args.passedTitle, "YYYYMMDD")
+	f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "4")
+		'f.Data.DataTable.SetValueFormat("csvUploadDT", -1, v.Args.passedTitle, v.Args.passedTitle, "YYYYMMDD")
+	f.Intrinsic.Control.EndIf
+
+
+'	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.DataTable.csvUploadDT.RowCount--, 1)
+'		f.Intrinsic.Control.If(v.Global.sDateFormat.Trim, =, "1")
+'			v.Local.sTemp.Set(v.DataTable.csvUploadDT(v.Local.iCnt).[v.Args.passedTitle]!FieldValTrim)
+'			f.Intrinsic.String.Format(V.Local.sTemp, "YYYYMMDD", v.Local.sTemp)
+'			f.Data.DataTable.SetValue("csvUploadDT", v.Local.iCnt, v.Args.passedTitle, v.Local.sTemp)
+'		f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "2")
+'			v.Local.sTemp.Set(v.DataTable.csvUploadDT(v.Local.iCnt).[v.Args.passedTitle]!FieldValTrim)
+'			f.Intrinsic.String.Format(V.Local.sTemp, "YYYYMMDD", v.Local.sTemp)
+'			f.Data.DataTable.SetValue("csvUploadDT", v.Local.iCnt, v.Args.passedTitle, v.Local.sTemp)
+'		f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "3")
+'			v.Local.sTemp.Set(v.DataTable.csvUploadDT(v.Local.iCnt).[v.Args.passedTitle]!FieldValTrim)
+'			f.Intrinsic.String.Split(v.Local.sTemp, " ", v.Local.sTemp)
+'			f.Intrinsic.String.Format(V.Local.sTemp(0), "YYYYMMDD", v.Local.sTemp(0))
+'			f.Data.DataTable.SetValue("csvUploadDT", v.Local.iCnt, v.Args.passedTitle, v.Local.sTemp(0))
+'		f.Intrinsic.Control.EndIf
+'	f.Intrinsic.Control.Next(v.Local.iCnt)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.formatColumnsDate.End
+
+Program.Sub.writeEDI.Start
+v.Local.sFilter.Declare
+v.Local.sHeader.Declare
+v.Local.sTemp.Declare
+v.Local.sColumnNameTemp.Declare
+v.Local.sCharTest.Declare
+v.Local.sTempFilter.Declare
+v.Local.iCntOrdersDTPassed.Declare
+v.Local.iCntLinesDT.Declare
+v.Local.iLenght.Declare
+v.Local.iLineNbr.Declare
+v.Local.iCnt.Declare
+v.Local.iUpperBound.Declare
+v.Local.sLine.Declare
+v.Local.sText.Declare
+v.Local.sFilePath.Declare
+v.Local.sPO.Declare
+v.Local.bFileExists.Declare
+v.Local.sConfFileName.Declare(string)
+v.Local.iCntNew.Declare
+
+f.Intrinsic.Control.Try
+'Create Groups
+f.Intrinsic.Control.If(v.Global.sLineGrouping.Trim, =, "")
+	v.Local.sFilter.Set(v.Global.sHeaderGrouping)
+f.Intrinsic.Control.Else
+	f.Intrinsic.String.Build("{0}*!*{1}", v.Global.sHeaderGrouping, v.Global.sLineGrouping, v.Local.sFilter)
+f.Intrinsic.Control.EndIf
+
+
+f.Data.DataView.Create("csvUploadDT", "csvUploadDV", 22)
+f.Data.DataView.ToDataTableDistinct("csvUploadDT", "csvUploadDV", "distinctHeaders", v.Global.sHeaderGrouping, true)
+f.Data.DataView.SetSort("csvUploadDT", "csvUploadDV", v.Global.sLineSorting)
+'Check if no grouping and add 
+f.Intrinsic.Control.If(v.Global.sLineGrouping.Trim, =, "")
+	f.Data.DataTable.AddColumn("csvUploadDT", "distinctLineCol", "Long")
+	f.Data.DataTable.SetSeries("csvUploadDT", "distinctLineCol", 0, 1)
+	f.Intrinsic.String.Build("{0}*!*distinctLineCol", v.Local.sFilter, v.Local.sFilter)
+	'f.Intrinsic.String.Split(v.Global.sLineSorting, )
+f.Intrinsic.Control.EndIf
+
+f.Data.DataView.ToDataTableDistinct("csvUploadDT", "csvUploadDV", "distinctLines", v.Local.sFilter, true)
+
+'I know the specific index for each fieldtitle so I can call the correct column.
+f.Intrinsic.Control.For(v.Local.iCntOrdersDTPassed, 0, v.DataTable.distinctHeaders.RowCount--, 1)
+	v.Local.sHeader.Set("")
+	'Create Header
+	
+	f.Intrinsic.String.Split(v.Global.sHeaderGrouping, "*!*", v.Local.sTempFilter)
+	
+	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.sTempFilter.UBound, 1)
+		f.Intrinsic.String.Build("{0} ='{1}'", v.Local.sTempFilter(v.Local.iCnt), v.DataTable.distinctHeaders(v.Local.iCntOrdersDTPassed).[v.Local.sTempFilter(v.Local.iCnt)]!FieldVal, v.Local.sTempFilter(v.Local.iCnt))
+	f.Intrinsic.Control.Next(v.Local.iCnt)	 
+	f.Intrinsic.String.Join(v.Local.sTempFilter, " and ", v.Global.sDataviewFilter)
+
+	'f.Data.DataView.Create("csvUploadDT", "singleOrder", 22, "H3 = 'CSDI' and H4 = 'asd'", "")
+	f.Data.DataView.Create("csvUploadDT", "singleOrderDV", 22, v.Global.sDataviewFilter, "")
+	f.Data.DataView.ToDataTable("csvUploadDT", "singleOrderDV", "singleOrderDT", true)
+	f.Data.DataView.Close("csvUploadDT", "singleOrderDV")
+	'Buyer ID (35) - FieldtitleID [0]
+	'proccess is the same for every EDI Field.
+	'check if the customer assigned a column to this field or a default value. If blank, The script will fill the space needed for EDI.
+	
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 0, iCntOrdersDT, 0, passedLength, 35)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 35, v.Local.sHeader)
+		
+	'PO Number (15) - FieldtitleID [1]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 1, iCntOrdersDT, 0, passedLength, 15)
+	v.Local.sPO.Set(v.Global.sEDI_Text.Trim)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 50, v.Local.sHeader)
+		
+	'Line Number For Header = '000' (3) - FieldtitleID [2]
+	v.Local.sTemp.Set("000")
+	F.Intrinsic.String.Build("{0}{1}", V.Local.sHeader, V.Local.sTemp, V.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 53, v.Local.sHeader)
+
+	'Change Order Y/N (1) - FieldtitleID [3]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 3, iCntOrdersDT, 0, passedLength, 1)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 54, v.Local.sHeader)
+	
+	'PO Date CCYYMMDD (8) - FieldtitleID [4]
+	'***
+	v.Global.sEDI_Text.Set("")
+	'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 4, iCntOrdersDT, 0, passedLength, 8)
+	'New Date Edit
+	f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 4, iCntOrdersDT, 0, passedLength, 8)	
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 62, v.Local.sHeader)
+	
+	'Ship Date CCYYMMDD (8) - FieldtitleID [5]
+	'***
+	v.Global.sEDI_Text.Set("")
+	'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 5, iCntOrdersDT, 0, passedLength, 8)
+	'New Date Edit
+	f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 5, iCntOrdersDT, 0, passedLength, 8)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 70, v.Local.sHeader)
+	
+	'Ship To Code (17) - FieldtitleID [6]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 6, iCntOrdersDT, 0, passedLength, 17)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 87, v.Local.sHeader)
+	
+	'Terms Discount Due Date (8) - FieldtitleID [7]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 7, iCntOrdersDT, 0, passedLength, 8)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 95, v.Local.sHeader)
+	
+	'Change By Date Y/N (1) - FieldtitleID [8]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 8, iCntOrdersDT, 0, passedLength, 1)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 96, v.Local.sHeader)
+	
+	'Release Number (25) - FieldtitleID [9]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 9, iCntOrdersDT, 0, passedLength, 25)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 121, v.Local.sHeader)
+		
+	'Release Start Date CCYYMMDD (8) - FieldtitleID [10]
+	v.Global.sEDI_Text.Set("")
+	'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 10, iCntOrdersDT, 0, passedLength, 8)
+	'New Date Edit
+	f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 10, iCntOrdersDT, 0, passedLength, 8)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 129, v.Local.sHeader)
+	
+	'Release End Date CCYYMMDD (8) - FieldtitleID [11]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 11, iCntOrdersDT, 0, passedLength, 8)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 137, v.Local.sHeader)
+	
+	'Hold Type (1) - FieldtitleID [12]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 12, iCntOrdersDT, 0, passedLength, 1)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 138, v.Local.sHeader)
+	
+	'Change Type (1) - FieldtitleID [13]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 13, iCntOrdersDT, 0, passedLength, 1)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 139, v.Local.sHeader)
+	
+	'Transaction (3) - FieldtitleID [14]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 14, iCntOrdersDT, 0, passedLength, 3)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 142, v.Local.sHeader)
+	
+	'Trading Partner CD (3) - FieldtitleID [15]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 15, iCntOrdersDT, 0, passedLength, 3)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 145, v.Local.sHeader)
+	
+	'Price From Quote (1) - FieldtitleID [16]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 16, iCntOrdersDT, 0, passedLength, 1)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 146, v.Local.sHeader)
+	
+	'Accum RCPT (10) - FieldtitleID [17]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, "0", passedDT, "singleOrderDT", passedFieldID, 17, iCntOrdersDT, 0, passedLength, 10)
+	''''f.Intrinsic.Control.CallSub(addEdiFieldNum, passedFieldID, 17, iCntOrdersDT, v.Local.iCntLinesDT, passedLength, 10)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 156, v.Local.sHeader)
+	
+	'Last Received QTY (10) - FieldtitleID [18]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, "0", passedDT, "singleOrderDT", passedFieldID, 18, iCntOrdersDT, 0, passedLength, 10)
+	'f.Intrinsic.Control.CallSub(addEdiFieldNum, passedFieldID, 18, iCntOrdersDT, v.Local.iCntLinesDT, passedLength, 10)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 166, v.Local.sHeader)
+	
+	'Last Received Date CCYYMMDD (8) - FieldtitleID [19]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, "0", passedDT, "singleOrderDT", passedFieldID, 19, iCntOrdersDT, 0, passedLength, 8)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 174, v.Local.sHeader)
+	
+	'855 Flag Y/N (1) - FieldtitleID [20]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 20, iCntOrdersDT, 0, passedLength, 1)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 175, v.Local.sHeader)
+	
+	'Filler (335) - FieldtitleID [21]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 21, iCntOrdersDT, 0, passedLength, 335)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 510, v.Local.sHeader)
+	
+	'Record Type: Header = H (1) - FieldtitleID [22]
+	v.Local.sTemp.Set("H")
+	f.Intrinsic.String.Build("{0}{1}", V.Local.sHeader, V.Local.sTemp, V.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 511, v.Local.sHeader)
+	
+	'Conversion Flag (1) - FieldtitleID [23]
+	v.Global.sEDI_Text.Set("")
+	f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 23, iCntOrdersDT, 0, passedLength, 1)
+	f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+	f.Intrinsic.String.RPad(v.Local.sHeader, " ", 512, v.Local.sHeader)
+	
+	'Save Header to File 
+	f.Intrinsic.Control.If(v.Local.sText, =, "")
+		f.Intrinsic.String.Build("{0}", v.Local.sHeader, v.Local.sText)
+	f.Intrinsic.Control.Else
+		f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sHeader, v.Local.sText)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Global.iHeaderA, =, 1)
+		v.Local.sHeader.Set("")
+		'Buyer ID (35) - FieldtitleID [0]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 0, iCntOrdersDT, 0, passedLength, 35)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 35, v.Local.sHeader)
+		
+		'PO Number (15) - FieldtitleID [1]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 1, iCntOrdersDT, 0, passedLength, 15)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 50, v.Local.sHeader)
+		
+		'Line Number For Header = '000' (3) - FieldtitleID [2]
+		v.Local.sTemp.Set("000")
+		F.Intrinsic.String.Build("{0}{1}", V.Local.sHeader, V.Local.sTemp, V.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 53, v.Local.sHeader)
+		
+		'A-Change-Order (1) - FieldtitleID [24]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 24, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 54, v.Local.sHeader)
+		
+		'A-Contract-Num (6) - FieldtitleID [25]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, "0", passedDT, "singleOrderDT", passedFieldID, 25, iCntOrdersDT, 0, passedLength, 6)
+		'f.Intrinsic.Control.CallSub(addEdiFieldNum, passedFieldID, 25, iCntOrdersDT, 0, passedLength, 6)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 60, v.Local.sHeader)
+		
+		'A-User1 (30) - FieldtitleID [26]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 26, iCntOrdersDT, 0, passedLength, 30)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 90, v.Local.sHeader)
+		
+		'A-User2 (30) - FieldtitleID [27]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 27, iCntOrdersDT, 0, passedLength, 30)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 120, v.Local.sHeader)
+		
+		'A-User3 (30) - FieldtitleID [28]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 28, iCntOrdersDT, 0, passedLength, 30)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 150, v.Local.sHeader)
+		
+		'A-User4 (30) - FieldtitleID [29]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 29, iCntOrdersDT, 0, passedLength, 30)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 180, v.Local.sHeader)
+		
+		'A-User5 (30) - FieldtitleID [30]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 30, iCntOrdersDT, 0, passedLength, 30)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 210, v.Local.sHeader)
+		
+		'A-Order_Sort1 (20) - FieldtitleID [31]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 31, iCntOrdersDT, 0, passedLength, 20)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 230, v.Local.sHeader)
+		
+		'A-Order_Sort2 (30) - FieldtitleID [32]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 32, iCntOrdersDT, 0, passedLength, 30)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 260, v.Local.sHeader)
+		
+		'A-Order-Currency (3) - FieldtitleID [33]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 33, iCntOrdersDT, 0, passedLength, 3)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 263, v.Local.sHeader)
+		
+		'A-BillContact-Email (100) - FieldtitleID [34]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 34, iCntOrdersDT, 0, passedLength, 100)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 363, v.Local.sHeader)
+		
+		'A-Via (20) - FieldtitleID [35]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 35, iCntOrdersDT, 0, passedLength, 20)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 383, v.Local.sHeader)
+		
+		'A-Mark_Shipment (30) - FieldtitleID [36]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 36, iCntOrdersDT, 0, passedLength, 30)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 413, v.Local.sHeader)
+		
+		'A-FOB_Info (14) - FieldtitleID [37]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 37, iCntOrdersDT, 0, passedLength, 14)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 427, v.Local.sHeader)
+		
+		'A-Bill (19) - FieldtitleID [38]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 38, iCntOrdersDT, 0, passedLength, 19)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 446, v.Local.sHeader)
+		
+		'A-Carrier-Code (6) - FieldtitleID [39]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 39, iCntOrdersDT, 0, passedLength, 6)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 452, v.Local.sHeader)
+		
+		'A-Sales-Code (3) - FieldtitleID [40]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 40, iCntOrdersDT, 0, passedLength, 3)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 455, v.Local.sHeader)
+		
+		'A-GL_Account (3) - FieldtitleID [41]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 41, iCntOrdersDT, 0, passedLength, 15)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 470, v.Local.sHeader)
+		
+		'A-LOCN (2) - FieldtitleID [42]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 42, iCntOrdersDT, 0, passedLength, 2)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 472, v.Local.sHeader)
+		
+		'A-Filler (38) - FieldtitleID [43]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 43, iCntOrdersDT, 0, passedLength, 38)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 510, v.Local.sHeader)
+		
+		'A-RecordType (1) - FieldtitleID [44]
+		v.Global.sEDI_Text.Set("A")
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 511, v.Local.sHeader)
+		
+		'A-Conversion-Flag (1) - FieldtitleID [45]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 45, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 512, v.Local.sHeader)
+		
+		'Save Header to File 
+		f.Intrinsic.Control.If(v.Local.sText, =, "")
+			f.Intrinsic.String.Build("{0}", v.Local.sHeader, v.Local.sText)
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sHeader, v.Local.sText)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Global.iHeaderB, =, 1)
+		v.Local.sHeader.Set("")
+		'Buyer ID (35) - FieldtitleID [0]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 0, iCntOrdersDT, 0, passedLength, 35)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 35, v.Local.sHeader)
+		
+		'PO Number (15) - FieldtitleID [1]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 1, iCntOrdersDT, 0, passedLength, 15)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 50, v.Local.sHeader)
+		
+		'Line Number For Header = '000' (3) - FieldtitleID [2]
+		v.Local.sTemp.Set("000")
+		F.Intrinsic.String.Build("{0}{1}", V.Local.sHeader, V.Local.sTemp, V.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 53, v.Local.sHeader)
+		
+		'B-Change-Order (1) - FieldtitleID [46]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 46, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 54, v.Local.sHeader)
+		
+		'B-Bill-To-Name (40) - FieldtitleID [47]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 47, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 94, v.Local.sHeader)
+		
+		'B-Bill-To-Address-1 (40) - FieldtitleID [48]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 48, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 134, v.Local.sHeader)
+		
+		'B-Bill-To-Address-2 (40) - FieldtitleID [49]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 49, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 174, v.Local.sHeader)
+		
+		'B-Bill-To-Address-3 (40) - FieldtitleID [50]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 50, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 214, v.Local.sHeader)
+		
+		'B-Bill-To-Address-4 (40) - FieldtitleID [51]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 51, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 254, v.Local.sHeader)
+		
+		'B-Bill-To-Address-5 (40) - FieldtitleID [52]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 52, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 294, v.Local.sHeader)
+		
+		'B-Bill-To-City (25) - FieldtitleID [53]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 53, iCntOrdersDT, 0, passedLength, 25)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 319, v.Local.sHeader)
+		
+		'B-Bill-To-State (2) - FieldtitleID [54]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 54, iCntOrdersDT, 0, passedLength, 2)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 321, v.Local.sHeader)
+		
+		'B-Bill-To-Zip (13) - FieldtitleID [55]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 55, iCntOrdersDT, 0, passedLength, 13)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 334, v.Local.sHeader)
+		
+		'B-Bill-To-Country (25) - FieldtitleID [56]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 56, iCntOrdersDT, 0, passedLength, 25)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 359, v.Local.sHeader)
+		
+		'B-Bill-To-ATTN (40) - FieldtitleID [57]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 57, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 399, v.Local.sHeader)
+		
+		'B-Bill-To-Contact (30) - FieldtitleID [58]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 58, iCntOrdersDT, 0, passedLength, 30)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 429, v.Local.sHeader)
+		
+		'B-Bill-To-Phone (20) - FieldtitleID [59]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 59, iCntOrdersDT, 0, passedLength, 20)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 449, v.Local.sHeader)
+		
+		'B-Bill-To-Intl-Adrs-YN (1) - FieldtitleID [60]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 60, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 450, v.Local.sHeader)
+		
+		'B-Filler (60) - FieldtitleID [61]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 61, iCntOrdersDT, 0, passedLength, 60)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 510, v.Local.sHeader)
+		
+		'B-RecordType (1) - FieldtitleID [62]
+		v.Global.sEDI_Text.Set("B")
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 511, v.Local.sHeader)
+		
+		'B-Conversion Flag (1) - FieldtitleID [63]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 63, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 512, v.Local.sHeader)
+		
+		'Save Header to File 
+		f.Intrinsic.Control.If(v.Local.sText, =, "")
+			f.Intrinsic.String.Build("{0}", v.Local.sHeader, v.Local.sText)
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sHeader, v.Local.sText)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Global.iHeaderC, =, 1)
+		v.Local.sHeader.Set("")
+		'Buyer ID (35) - FieldtitleID [0]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 0, iCntOrdersDT, 0, passedLength, 35)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 35, v.Local.sHeader)
+		
+		'PO Number (15) - FieldtitleID [1]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 1, iCntOrdersDT, 0, passedLength, 15)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 50, v.Local.sHeader)
+		
+		'Line Number For Header = '000' (3) - FieldtitleID [2]
+		v.Local.sTemp.Set("000")
+		F.Intrinsic.String.Build("{0}{1}", V.Local.sHeader, V.Local.sTemp, V.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 53, v.Local.sHeader)
+		
+		'C-Change-Order (1) - FieldtitleID [64]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 64, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 54, v.Local.sHeader)
+		
+		'C-Ship-To-Name (40) - FieldtitleID [65]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 65, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 94, v.Local.sHeader)
+		
+		'C-Ship-To-Address-1 (40) - FieldtitleID [66]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 66, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 134, v.Local.sHeader)
+		
+		'C-Ship-To-Address-2 (40) - FieldtitleID [67]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 67, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 174, v.Local.sHeader)
+		
+		'C-Ship-To-Address-3 (40) - FieldtitleID [68]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 68, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 214, v.Local.sHeader)
+		
+		'C-Ship-To-Address-4 (40) - FieldtitleID [69]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 69, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 254, v.Local.sHeader)
+		
+		'C-Ship-To-Address-5 (40) - FieldtitleID [70]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 70, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 294, v.Local.sHeader)
+		
+		'C-Ship-To-City (25) - FieldtitleID [71]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 71, iCntOrdersDT, 0, passedLength, 25)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 319, v.Local.sHeader)
+		
+		'C-Ship-To-State (2) - FieldtitleID [72]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 72, iCntOrdersDT, 0, passedLength, 2)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 321, v.Local.sHeader)
+		
+		'C-Ship-To-Zip (13) - FieldtitleID [73]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 73, iCntOrdersDT, 0, passedLength, 13)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 334, v.Local.sHeader)
+		
+		'C-Ship-To-Country (25) - FieldtitleID [74]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 74, iCntOrdersDT, 0, passedLength, 25)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 359, v.Local.sHeader)
+		
+		'C-Ship-To-ATTN (40) - FieldtitleID [75]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 75, iCntOrdersDT, 0, passedLength, 40)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 399, v.Local.sHeader)
+		
+		'C-Ship-To-Intl-Adrs-YN (1) - FieldtitleID [76]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 76, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 400, v.Local.sHeader)
+		
+		'C-Filler (110) - FieldtitleID [77]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 77, iCntOrdersDT, 0, passedLength, 110)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 510, v.Local.sHeader)
+		
+		'C-RecordType (1) - FieldtitleID [78]
+		v.Global.sEDI_Text.Set("C")
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 511, v.Local.sHeader)
+		
+		'C-Conversion Flag (1) - FieldtitleID [79]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 79, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 512, v.Local.sHeader)
+		
+		'Save Header to File 
+		f.Intrinsic.Control.If(v.Local.sText, =, "")
+			f.Intrinsic.String.Build("{0}", v.Local.sHeader, v.Local.sText)
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sHeader, v.Local.sText)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Global.iHeaderN, =, 1)
+		v.Local.sHeader.Set("")
+		'Buyer ID (35) - FieldtitleID [0]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 0, iCntOrdersDT, 0, passedLength, 35)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 35, v.Local.sHeader)
+		
+		'PO Number (15) - FieldtitleID [1]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 1, iCntOrdersDT, 0, passedLength, 15)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 50, v.Local.sHeader)
+		
+		'Line Number For Header = '000' (3) - FieldtitleID [2]
+		v.Local.sTemp.Set("000")
+		F.Intrinsic.String.Build("{0}{1}", V.Local.sHeader, V.Local.sTemp, V.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 53, v.Local.sHeader)
+		
+		'N-Change-Order (1) - FieldtitleID [142]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 142, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 54, v.Local.sHeader)
+		
+		'N-Note-1 (30) - FieldtitleID [143]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 143, iCntOrdersDT, 0, passedLength, 450)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 504, v.Local.sHeader)
+'		'N-Note-2 (30) - FieldtitleID [144]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 144, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-3 (30) - FieldtitleID [145]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 145, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-4 (30) - FieldtitleID [146]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 146, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-5 (30) - FieldtitleID [147]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 147, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-6 (30) - FieldtitleID [148]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 148, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-7 (30) - FieldtitleID [149]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 149, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-8 (30) - FieldtitleID [150]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 150, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-9 (30) - FieldtitleID [151]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 151, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-10 (30) - FieldtitleID [152]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 152, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-11 (30) - FieldtitleID [153]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 153, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-12 (30) - FieldtitleID [154]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 154, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-13 (30) - FieldtitleID [155]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 155, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-14 (30) - FieldtitleID [156]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 156, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+'		
+'		'N-Note-15 (30) - FieldtitleID [157]
+'		v.Global.sEDI_Text.Set("")
+'		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 157, iCntOrdersDT, 0, passedLength, 30)
+'		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		
+		'N-Filler (6) - FieldtitleID [158]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 158, iCntOrdersDT, 0, passedLength, 6)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 510, v.Local.sHeader)
+		
+		'N-Record-Type (1) - FieldtitleID [159]
+		v.Global.sEDI_Text.Set("N")
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 511, v.Local.sHeader)
+		
+		'N-Conversion-Flag (1) - FieldtitleID [160]
+		v.Global.sEDI_Text.Set("")
+		f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleOrderDT", passedFieldID, 160, iCntOrdersDT, 0, passedLength, 1)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sHeader, v.Global.sEDI_Text, v.Local.sHeader)
+		f.Intrinsic.String.RPad(v.Local.sHeader, " ", 512, v.Local.sHeader)
+		
+		'Save Header to File 
+		f.Intrinsic.Control.If(v.Local.sText, =, "")
+			f.Intrinsic.String.Build("{0}", v.Local.sHeader, v.Local.sText)
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sHeader, v.Local.sText)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	
+	'f.Intrinsic.String.Build("{0} = '{1}'", v.Global.sPO_Column, v.Local.sPO, v.Local.sFilter)
+	f.Data.DataView.Create("distinctLines", "distinctLinesDV", 22, v.Global.sDataviewFilter, v.Global.sLineSorting)
+'	f.Intrinsic.String.Build("{0}*!*{1}", v.Global.sHeaderGrouping, v.Global.sLineGrouping, v.Local.sFilter)
+	
+	f.Intrinsic.Control.If(v.Global.sLineGrouping.Trim, =, "")
+		'v.Local.sFilter.Set(v.Global.sHeaderGrouping)
+		f.Intrinsic.String.Build("{0}*!*distinctLineCol", v.Global.sHeaderGrouping, v.Local.sFilter)
+	f.Intrinsic.Control.Else
+		f.Intrinsic.String.Build("{0}*!*{1}", v.Global.sHeaderGrouping, v.Global.sLineGrouping, v.Local.sFilter)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.For(v.Local.iCntLinesDT, 0, v.DataView.distinctLines!distinctLinesDV.RowCount--, 1)
+
+		f.Intrinsic.String.Split(v.Local.sFilter, "*!*", v.Local.sTempFilter)
+		f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.sTempFilter.UBound, 1)
+			f.Intrinsic.String.Build("{0} ='{1}'", v.Local.sTempFilter(v.Local.iCnt), v.DataView.distinctLines!distinctLinesDV(v.Local.iCntLinesDT).[v.Local.sTempFilter(v.Local.iCnt)]!FieldVal, v.Local.sTempFilter(v.Local.iCnt))
+		f.Intrinsic.Control.Next(v.Local.iCnt)	 
+		f.Intrinsic.String.Join(v.Local.sTempFilter, " and ", v.Global.sDataviewFilter)
+		f.Data.DataView.Create("csvUploadDT", "SingleLineDV", 22, v.Global.sDataviewFilter, "")
+		f.Data.DataView.ToDataTable("csvUploadDT", "SingleLineDV", "singleLineDT", true)
+		f.Data.DataView.Close("csvUploadDT", "SingleLineDV")
+		
+		'f.Intrinsic.Control.For(v.Local.iCntNew, 0, v.DataTable.singleLineDT.RowCount--, 1)
+			
+		
+		'check if line has multiple lines.
+		f.Intrinsic.Control.If(v.DataTable.singleLineDT.RowCount, >, 0)
+		
+			v.Local.sLine.Set("")
+			f.Intrinsic.Math.Add(v.Local.iCntLinesDT, 1, v.Local.iLineNbr)
+			'Buyer ID (35) - FieldtitleID [0]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 0, iCntOrdersDT, 0, passedLength, 35)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 35, v.Local.sLine)
+			
+			'PO Number (15) - FieldtitleID [1]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 1, iCntOrdersDT, 0, passedLength, 15)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 50, v.Local.sLine)
+			
+			'Line Number For Header = '000' (3) - FieldtitleID [80]
+			v.Global.sEDI_Text.Set(v.Local.iLineNbr)
+			f.Intrinsic.String.LPad(v.Global.sEDI_Text, "0", 3, v.Global.sEDI_Text)
+			'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 81, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 53, v.Local.sLine)
+			
+			'L-Change Order Y/N (1) - FieldtitleID [81]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 81, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 54, v.Local.sLine)
+			
+			'L-Buyer Part Num (20) - FieldtitleID [82]
+			v.Global.sEDI_Text.Set("")
+			'Check if using Revision.
+			f.Intrinsic.Control.If(v.DataTable.columntitlesDT(161).FieldValue!FieldValTrim, =, "")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 82, iCntOrdersDT, 0, passedLength, 20)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.Control.Else
+				'Add Part
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 82, iCntOrdersDT, 0, passedLength, 17)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				'Add Rev
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 161, iCntOrdersDT, 0, passedLength, 3)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.Control.EndIf
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 74, v.Local.sLine)
+			
+			'L-Buyer Part Loc (2) - FieldtitleID [83]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 83, iCntOrdersDT, 0, passedLength, 2)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)	
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 76, v.Local.sLine)
+			
+			'L Order Quantity (8)V(4) - FieldtitleID [84]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiFieldFloat, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 84, iCntOrdersDT, 0, passedLength, 12, passedQTY1, 8, passedQTY2, 4)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 88, v.Local.sLine)
+			
+			'L UOM (2) - FieldtitleID [85]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 85, iCntOrdersDT, 0, passedLength, 2)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 90, v.Local.sLine)
+			
+			'L Price (8)V(5) - FieldtitleID [86]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiFieldFloat, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 86, iCntOrdersDT, 0, passedLength, 13, passedQTY1, 8, passedQTY2, 5)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 103, v.Local.sLine)
+			
+			'L Part Description (30) - FieldtitleID [87]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 87, iCntOrdersDT, 0, passedLength, 30)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 133, v.Local.sLine)
+			
+			'L Bulk Num (30)  - FieldtitleID [88]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 88, iCntOrdersDT, 0, passedLength, 30)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 163, v.Local.sLine)
+			
+			'L Bin Num (30) - FieldtitleID [89]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 89, iCntOrdersDT, 0, passedLength, 30)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 193, v.Local.sLine)
+			
+			'L Accum Recpt (8) - FieldtitleID [90]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 90, iCntOrdersDT, 0, passedLength, 8)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 201, v.Local.sLine)
+			
+			'L In Transit (8) - FieldtitleID [91]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 91, iCntOrdersDT, 0, passedLength, 8)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 209, v.Local.sLine)
+			
+			'L Last Recpt Qty (8) - FieldtitleID [92]
+			v.Global.sEDI_Text.Set("")
+			'f.Intrinsic.Control.CallSub(addEdiFieldFloat, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 92, iCntOrdersDT, 0, passedLength, 13, passedQTY1, 8, passedQTY2, 5)
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 92, iCntOrdersDT, 0, passedLength, 8)
+			f.Intrinsic.String.Trim(v.Global.sEDI_Text, v.Global.sEDI_Text)
+			f.Intrinsic.String.LPad(v.Global.sEDI_Text, "0", 8, v.Global.sEDI_Text)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 217, v.Local.sLine)
+			
+			'Last Recpt Date (8) - FieldtitleID [93]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 93, iCntOrdersDT, 0, passedLength, 8)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 225, v.Local.sLine)
+			
+			'L Po Line Num (3) - FieldtitleID [94]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 94, iCntOrdersDT, 0, passedLength, 3)			
+			f.Intrinsic.String.Trim(v.Global.sEDI_Text, v.Global.sEDI_Text)
+			f.Intrinsic.Control.If(v.Global.sEDI_Text.IsNumeric)
+				f.Intrinsic.String.LPad(v.Global.sEDI_Text, "0", 3, v.Global.sEDI_Text)
+			f.Intrinsic.Control.Else
+				v.Global.sEDI_Text.Set("   ")
+			f.Intrinsic.Control.EndIf
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 228, v.Local.sLine)
+			
+			'L Write Inventory (1) - FieldtitleID [95]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 95, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 229, v.Local.sLine)
+			
+			'L Price Check Dec (1) - FieldtitleID [96]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 96, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 230, v.Local.sLine)
+			
+			'L Long Part Num (35) - FieldtitleID [97]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 97, iCntOrdersDT, 0, passedLength, 35)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 265, v.Local.sLine)
+			
+			'L Mult Qty (1) - FieldtitleID [98]
+			f.Intrinsic.Control.If(v.Global.iShipM, =, 1)
+				v.Global.sEDI_Text.Set("Y")
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.Control.Else
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 98, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.Control.EndIf
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 266, v.Local.sLine)
+			
+				
+			'L MQD DUE DATE (8) - FieldtitleID [99]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 99, iCntOrdersDT, 0, passedLength, 8)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 274, v.Local.sLine)
+			
+			'L Order Type (1) - FieldtitleID [100]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 100, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 275, v.Local.sLine)
+			
+			'L Ship To Code (17) - FieldtitleID [101]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 101, iCntOrdersDT, 0, passedLength, 17)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 292, v.Local.sLine)
+			
+			'L Old Ship To Code (17) - FieldtitleID [102]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 102, iCntOrdersDT, 0, passedLength, 17)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 309, v.Local.sLine)
+			
+			'L Hold Type (1) - FieldtitleID [103]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 103, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 310, v.Local.sLine)
+			
+			'L Info 1 (20) - FieldtitleID [104]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 104, iCntOrdersDT, 0, passedLength, 20)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 330, v.Local.sLine)
+			
+			'L Info 2 (20) - FieldtitleID [105]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 105, iCntOrdersDT, 0, passedLength, 20)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 350, v.Local.sLine)
+			
+			'L Change Type (1) - FieldtitleID [106]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 106, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 351, v.Local.sLine)
+			
+			'L Transaction (3) - FieldtitleID [107]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 107, iCntOrdersDT, 0, passedLength, 3)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 354, v.Local.sLine)
+			
+			'L User 1 (30) - FieldtitleID [108]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 108, iCntOrdersDT, 0, passedLength, 30)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 384, v.Local.sLine)
+			
+			'L User 2 (30) - FieldtitleID [109]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 109, iCntOrdersDT, 0, passedLength, 30)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 414, v.Local.sLine)
+			
+			'L User 3 (30) - FieldtitleID [110]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 110, iCntOrdersDT, 0, passedLength, 30)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 444, v.Local.sLine)
+			
+			'L User 4 (30) - FieldtitleID [111]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 111, iCntOrdersDT, 0, passedLength, 30)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 474, v.Local.sLine)
+			
+			'L Item Promise date (8) - FieldtitleID [112]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 112, iCntOrdersDT, 0, passedLength, 8)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 482, v.Local.sLine)
+			
+			'L LN Line Type (1) - FieldtitleID [113]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 113, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 483, v.Local.sLine)
+			
+			'L Negative QTY Flag (1) - FieldtitleID [114]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 114, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 484, v.Local.sLine)
+			
+			'L Trigger Part Flag (1) - FieldtitleID [115]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 115, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 485, v.Local.sLine)
+			
+			'L Last Shipent ID (25) - FieldtitleID [116]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 116, iCntOrdersDT, 0, passedLength, 25)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 510, v.Local.sLine)
+			
+			'Record Type: Line = L (1) - FieldtitleID [117]
+			v.Local.sTemp.Set("1")
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Local.sTemp, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 511, v.Local.sLine)
+			
+			'Conversion Flag (1) - FieldtitleID [118]
+			v.Global.sEDI_Text.Set("")
+			f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 118, iCntOrdersDT, 0, passedLength, 1)
+			f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+			f.Intrinsic.String.RPad(v.Local.sLine, " ", 512, v.Local.sLine)
+			
+			'Save Line to File 
+			f.Intrinsic.Control.If(v.Local.sText, =, "")
+				f.Intrinsic.String.Build("{0}", v.Local.sLine, v.Local.sText)
+			f.Intrinsic.Control.Else
+				f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sLine, v.Local.sText)
+			f.Intrinsic.Control.EndIf	
+	
+			f.Intrinsic.Control.If(v.Global.iLine2, =, 1)	
+				v.Local.sLine.Set("")
+				'Buyer ID (35) - FieldtitleID [0]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 0, iCntOrdersDT, 0, passedLength, 35)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 35, v.Local.sLine)
+				
+				'PO Number (15) - FieldtitleID [1]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 1, iCntOrdersDT, 0, passedLength, 15)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 50, v.Local.sLine)
+				
+				'Line Number For Header = '000' (3) - FieldtitleID [80]
+				v.Global.sEDI_Text.Set(v.Local.iLineNbr)
+				f.Intrinsic.String.LPad(v.Global.sEDI_Text, "0", 3, v.Global.sEDI_Text)
+				'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 80, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 53, v.Local.sLine)
+				
+				'L2-Change Order Y/N (1) - FieldtitleID [119]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 119, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 54, v.Local.sLine)
+				
+				'L2-Weight (9) - FieldtitleID [120]
+				v.Global.sEDI_Text.Set("")
+				'SignedNumeric 5V4
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 120, iCntOrdersDT, 0, passedLength, 9)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 63, v.Local.sLine)
+				
+				'L2-Item-Sortkey (12) - FieldtitleID [121]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 121, iCntOrdersDT, 0, passedLength, 12)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 75, v.Local.sLine)
+				
+				'L2-Group (10) - FieldtitleID [122]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 122, iCntOrdersDT, 0, passedLength, 10)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 85, v.Local.sLine)
+				
+				'L2-Override-Unit-Price (1) - FieldtitleID [123]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 123, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 86, v.Local.sLine)
+				
+				'L2-Acumm-Recpt (12) - FieldtitleID [124]
+				v.Global.sEDI_Text.Set("")
+				'SignedNumeric 8V4
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 124, iCntOrdersDT, 0, passedLength, 12)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 98, v.Local.sLine)
+				
+				'L2-In-Transit (12) - FieldtitleID [125]
+				v.Global.sEDI_Text.Set("")
+				'SignedNumeric 8V4
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 125, iCntOrdersDT, 0, passedLength, 12)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 110, v.Local.sLine)
+				
+				'L2-Last-Recpt-Qty (12) - FieldtitleID [126]
+				v.Global.sEDI_Text.Set("")
+				'SignedNumeric 8V4
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 126, iCntOrdersDT, 0, passedLength, 12)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 122, v.Local.sLine)
+				
+				'L2-Filler (388) - FieldtitleID [127]
+				v.Global.sEDI_Text.Set("")
+				'SignedNumeric 8V4
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 126, iCntOrdersDT, 0, passedLength, 388)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 510, v.Local.sLine)
+				
+				'L2-Record-Type (1) - FieldtitleID [128]
+				v.Global.sEDI_Text.Set("2")
+				'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 128, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 511, v.Local.sLine)
+				
+				'L2-Conversion_Flag (1) - FieldtitleID [129]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 129, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 512, v.Local.sLine)
+				
+				'Save Line to File 
+				f.Intrinsic.Control.If(v.Local.sText, =, "")
+					f.Intrinsic.String.Build("{0}", v.Local.sLine, v.Local.sText)
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sLine, v.Local.sText)
+				f.Intrinsic.Control.EndIf	
+			f.Intrinsic.Control.EndIf
+			
+			f.Intrinsic.Control.If(v.Global.iLineN, =, 1)
+				v.Local.sLine.Set("")
+				'Buyer ID (35) - FieldtitleID [0]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 0, iCntOrdersDT, 0, passedLength, 35)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 35, v.Local.sLine)
+				
+				'PO Number (15) - FieldtitleID [1]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 1, iCntOrdersDT, 0, passedLength, 15)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 50, v.Local.sLine)
+				
+				'Line Number For Header = '000' (3) - FieldtitleID [2]
+				v.Global.sEDI_Text.Set(v.Local.iLineNbr)
+				f.Intrinsic.String.LPad(v.Global.sEDI_Text, "0", 3, v.Global.sEDI_Text)
+				'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 81, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 53, v.Local.sLine)
+				
+				'N-Change-Order (1) - FieldtitleID [142]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 142, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 54, v.Local.sLine)
+				
+				'N-Note-1 (30) - FieldtitleID [143]
+				v.Global.sEDI_Text.Set("")
+				'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 143, iCntOrdersDT, 0, passedLength, 450) 'Should be Note 1
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 143, iCntOrdersDT, 0, passedLength, 450)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 504, v.Local.sLine)
+'				'N-Note-2 (30) - FieldtitleID [144]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 144, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-3 (30) - FieldtitleID [145]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 145, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-4 (30) - FieldtitleID [146]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 146, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-5 (30) - FieldtitleID [147]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 147, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-6 (30) - FieldtitleID [148]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 148, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-7 (30) - FieldtitleID [149]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 149, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-8 (30) - FieldtitleID [150]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 150, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-9 (30) - FieldtitleID [151]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 151, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-10 (30) - FieldtitleID [152]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 152, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-11 (30) - FieldtitleID [153]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 153, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-12 (30) - FieldtitleID [154]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 154, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-13 (30) - FieldtitleID [155]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 155, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-14 (30) - FieldtitleID [156]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 156, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+'				
+'				'N-Note-15 (30) - FieldtitleID [157]
+'				v.Global.sEDI_Text.Set("")
+'				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 157, iCntOrdersDT, 0, passedLength, 30)
+'				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				
+				'N-Filler (6) - FieldtitleID [158]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 158, iCntOrdersDT, 0, passedLength, 6)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 510, v.Local.sLine)
+				
+				'N-Record-Type (1) - FieldtitleID [159]
+				v.Global.sEDI_Text.Set("N")
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 511, v.Local.sLine)
+				
+				'N-Conversion-Flag (1) - FieldtitleID [160]
+				v.Global.sEDI_Text.Set("")
+				f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 160, iCntOrdersDT, 0, passedLength, 1)
+				f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+				f.Intrinsic.String.RPad(v.Local.sLine, " ", 512, v.Local.sLine)
+				
+				'Save Line to File 
+				f.Intrinsic.Control.If(v.Local.sText, =, "")
+					f.Intrinsic.String.Build("{0}", v.Local.sLine, v.Local.sText)
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sLine, v.Local.sText)
+				f.Intrinsic.Control.EndIf			
+			f.Intrinsic.Control.EndIf
+	
+			f.Intrinsic.Control.If(v.Global.iShipM, =, 1)
+
+				f.Intrinsic.Control.For(v.Local.iCnt, 0, v.DataTable.singleLineDT.RowCount--, 1)
+					v.Local.sLine.Set("")
+					f.Intrinsic.Math.Add(v.Local.iCntLinesDT, 1, v.Local.iLineNbr)
+					'Buyer ID (35) - FieldtitleID [0]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 0, iCntOrdersDT, v.Local.iCnt, passedLength, 35)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 35, v.Local.sLine)
+					
+					'PO Number (15) - FieldtitleID [1]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 1, iCntOrdersDT, v.Local.iCnt, passedLength, 15)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 50, v.Local.sLine)
+					
+					'Line Number For Header = '000' (3) - FieldtitleID [130]
+					v.Global.sEDI_Text.Set(v.Local.iLineNbr)
+					f.Intrinsic.String.LPad(v.Global.sEDI_Text, "0", 3, v.Global.sEDI_Text)
+					'f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 130, iCntOrdersDT, v.Local.iCnt, passedLength, 1)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 53, v.Local.sLine)
+					
+					'M-Change Order Y/N (1) - FieldtitleID [131]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 131, iCntOrdersDT, v.Local.iCnt, passedLength, 1)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 54, v.Local.sLine)
+					
+					'M-Order-QTY-Prev (8V4) - FieldtitleID [132]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiFieldFloat, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 132, iCntOrdersDT, v.Local.iCnt, passedLength, 12, passedQTY1, 8, passedQTY2, 4)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 66, v.Local.sLine)
+					
+					'M-Order-Quantity (8V4) - FieldtitleID [133]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiFieldFloat, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 133, iCntOrdersDT, v.Local.iCnt, passedLength, 12, passedQTY1, 8, passedQTY2, 4)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 78, v.Local.sLine)
+					
+					'M-Due-Date-Prev (8) - FieldtitleID [134]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 134, iCntOrdersDT, v.Local.iCnt, passedLength, 8)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 86, v.Local.sLine)
+					
+					'M-Due-Date (8) - FieldtitleID [135]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiFieldDate, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 135, iCntOrdersDT, v.Local.iCnt, passedLength, 8)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 94, v.Local.sLine)
+					
+					'M-Order-Type  (1) - FieldtitleID [136]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 136, iCntOrdersDT, v.Local.iCnt, passedLength, 1)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 95, v.Local.sLine)
+					
+					'M-Change-Type  (1) - FieldtitleID [137]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 137, iCntOrdersDT, v.Local.iCnt, passedLength, 1)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 96, v.Local.sLine)
+					
+					'M-Info (30) - FieldtitleID [138]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 138, iCntOrdersDT, v.Local.iCnt, passedLength, 30)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 126, v.Local.sLine)
+					
+					'M-Filler (384) - FieldtitleID [139]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 139, iCntOrdersDT, v.Local.iCnt, passedLength, 384)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 510, v.Local.sLine)
+					
+					'M-Record-Type (1) - FieldtitleID [140]
+					v.Global.sEDI_Text.Set("M")
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 511, v.Local.sLine)
+					
+					'M-Conversion-Flag (1) - FieldtitleID [141]
+					v.Global.sEDI_Text.Set("")
+					f.Intrinsic.Control.CallSub(addEdiField, fillerChar, " ", passedDT, "singleLineDT", passedFieldID, 141, iCntOrdersDT, v.Local.iCnt, passedLength, 1)
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sLine, v.Global.sEDI_Text, v.Local.sLine)
+					f.Intrinsic.String.RPad(v.Local.sLine, " ", 512, v.Local.sLine)
+					
+					'Save Line to File 
+					f.Intrinsic.Control.If(v.Local.sText, =, "")
+						f.Intrinsic.String.Build("{0}", v.Local.sLine, v.Local.sText)
+					f.Intrinsic.Control.Else
+						f.Intrinsic.String.Build("{0}{1}{2}", v.Local.sText, v.Ambient.NewLine, v.Local.sLine, v.Local.sText)
+					f.Intrinsic.Control.EndIf	
+				f.Intrinsic.Control.Next(v.Local.iCnt)
+			f.Intrinsic.Control.EndIf					
+		f.Intrinsic.Control.EndIf
+		f.Data.DataTable.Close("singleLineDT")
+		'Function.Intrinsic.Debug.Stop
+		'f.Intrinsic.Control.Next(v.Local.iCntNew)
+	f.Intrinsic.Control.Next(v.Local.iCntLinesDT)
+	f.Data.DataView.Close("distinctLines", "distinctLinesDV")
+	f.Data.DataTable.Close("singleOrderDT")
+f.Intrinsic.Control.Next(v.Local.iCntOrdersDTPassed)
+
+f.Intrinsic.String.Build("{0}{1}", v.Local.sText, v.Ambient.NewLine, v.Local.sText)
+	
+'f.Intrinsic.String.Build("{0}\EA850_{1}", v.Caller.FilesDir, v.Caller.CompanyCode, v.Local.sFilePath)
+'f.Intrinsic.File.String2File(v.Local.sFilePath, v.Local.sText)
+
+v.Local.bLicense.Declare
+f.Global.General.ISLICENSEDBYMODULENAME("EDI", v.Local.bLicense)
+f.Intrinsic.Control.If(v.Local.bLicense, =, false)
+	f.Intrinsic.UI.Msgbox("No EDI License found. Please contact your Account Rep.")
+	f.Intrinsic.Control.End
+f.Intrinsic.Control.EndIf
+
+f.Intrinsic.String.Build("{0}\{1}_{2}", v.Global.sEdiDestFolder, v.Global.sFileName, v.Caller.CompanyCode, v.Local.sFilePath)
+f.Intrinsic.File.String2File(v.Local.sFilePath, v.Local.sText)
+f.Intrinsic.File.Exists(v.Local.sFilePath, v.Local.bFileExists)
+
+f.Intrinsic.Control.If(v.Local.bFileExists)
+	'Build confirmation file to show that script ran successfully
+	f.Intrinsic.String.Build("{0}\{1}{2}EDIConf.txt",v.Caller.LocalGSSTempDir,v.Caller.CompanyCode,v.Caller.Terminal,v.Local.sConfFileName)
+	f.Intrinsic.File.String2File(v.Local.sconffilename,"EDI was successful")
+f.Intrinsic.Control.Else
+	f.Intrinsic.UI.Msgbox("EDI File was not created. Please check settings or contact Global Shop.")
+f.Intrinsic.Control.EndIf
+
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.writeEDI.End
+
+Program.Sub.addEdiField.Start
+v.Local.sTemp.Declare
+v.Local.sColumnNameTemp.Declare
+v.Local.sCharTest.Declare
+v.Local.iLenght.Declare
+v.Local.ipassedCNT.Declare
+f.Intrinsic.Control.Try
+	v.Local.sTemp.Set("%")
+	'proccess is the same for every EDI Field.
+	'check if the customer assigned a column to this field or a default value. 
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(v.Args.passedFieldID).FieldValue!FieldValTrim, =, "")
+		'If blank, The script will fill the space needed for EDI.
+		f.Intrinsic.String.RPad(v.Local.sTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+		f.Intrinsic.String.Replace(v.Global.sEDI_Text, "%", " ", v.Global.sEDI_Text)
+		f.Intrinsic.Control.If(v.Global.sEDI_Text.Trim, =, "")
+			v.Global.sEDI_Text.Set(" ")
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.Else
+		'set the datatable variable in a local for ease.
+		v.Local.sColumnNameTemp.Set(v.DataTable.columntitlesDT(v.Args.passedFieldID).FieldValue!FieldValTrim)
+		f.Intrinsic.Control.If(v.Local.sColumnNameTemp.Length, >, 1)
+			'get the first character.
+			f.Intrinsic.String.Left(v.Local.sColumnNameTemp, 1, v.Local.sCharTest)
+			f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+				'If It is 'H' it might be a title. 
+				f.Intrinsic.Math.Sub(v.Local.sColumnNameTemp.Length, 1, v.Local.iLenght)
+				f.Intrinsic.String.Right(v.Local.sColumnNameTemp, v.Local.iLenght, v.Local.sTemp)
+				'check if the rest of characteres are numeric if that's the case it is a tittle.
+				f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+					v.Local.sTemp.Set(v.DataTable.[v.Args.passedDT](v.Args.iCntOrdersDT).[v.Local.sColumnNameTemp]!FieldVal)
+					f.Intrinsic.String.RPad(v.Local.sTemp.Trim, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.RPad(v.Local.sColumnNameTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+					f.Intrinsic.String.Left(v.Global.sEDI_Text, v.Args.passedLength, v.Global.sEDI_Text)
+				f.Intrinsic.Control.EndIf						
+			f.Intrinsic.Control.ElseIf(v.Local.sCharTest, =, "#")
+				'If it is not 'H' it is a default value and should be padded and saved.	
+				f.Intrinsic.Math.Sub(v.Local.sColumnNameTemp.Length, 1, v.Local.iLenght)
+				f.Intrinsic.String.Right(v.Local.sColumnNameTemp, v.Local.iLenght, v.Local.sTemp)
+				f.Intrinsic.String.RPad(v.Local.sTemp.Trim, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+			f.Intrinsic.Control.EndIf	
+		f.Intrinsic.Control.Else
+			f.Intrinsic.Control.If(v.Local.sColumnNameTemp, =, "#")
+				v.Local.sColumnNameTemp.Set("")
+			f.Intrinsic.Control.EndIf
+			f.Intrinsic.String.RPad(v.Local.sColumnNameTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.addEdiField.End
+
+Program.Sub.addEdiFieldFloat.Start
+v.Local.sTemp.Declare
+v.Local.sColumnNameTemp.Declare
+v.Local.sCharTest.Declare
+v.Local.iLenght.Declare
+v.Local.sQTY1.Declare
+v.Local.sQTY2.Declare
+
+f.Intrinsic.Control.Try
+	v.Local.sTemp.Set(" ")
+	'proccess is the same for every EDI Field.
+	'check if the customer assigned a column to this field or a default value. 
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(v.Args.passedFieldID).FieldValue!FieldValTrim, =, "")
+		'If blank, The script will fill the space needed for EDI.
+		f.Intrinsic.String.LPad(v.Local.sQTY1, "0", v.Args.passedQTY1, v.Local.sQTY1)
+		f.Intrinsic.String.RPad(v.Local.sQTY2, "0", v.Args.passedQTY2, v.Local.sQTY2)
+		f.Intrinsic.String.Build("{0}{1}", v.Local.sQTY1, v.Local.sQTY2, v.Global.sEDI_Text)
+	f.Intrinsic.Control.Else
+		'set the datatable variable in a local for ease.
+		v.Local.sColumnNameTemp.Set(v.DataTable.columntitlesDT(v.Args.passedFieldID).FieldValue!FieldValTrim)
+		f.Intrinsic.Control.If(v.Local.sColumnNameTemp.Length, >, 1)
+			'get the first character.
+			f.Intrinsic.String.Left(v.Local.sColumnNameTemp, 1, v.Local.sCharTest)
+			f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+				'If It is 'H' it might be a title. passedLength
+				f.Intrinsic.Math.Sub(v.Local.sColumnNameTemp.Length, 1, v.Local.iLenght)
+				f.Intrinsic.String.Right(v.Local.sColumnNameTemp, v.Local.iLenght, v.Local.sTemp)
+				'check if the rest of characteres are numeric if that's the case it is a tittle.
+				f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+					v.Local.sTemp.Set(v.DataTable.[v.Args.passedDT](v.Args.iCntOrdersDT).[v.Local.sColumnNameTemp]!FieldVal)
+					f.Intrinsic.String.Split(v.Local.sTemp, ".", v.Local.sTemp)
+					f.Intrinsic.String.LPad(v.Local.sTemp(0), "0", v.Args.passedQTY1, v.Local.sQTY1)
+					f.Intrinsic.Control.If(v.Local.sTemp(1), =, "OOB")
+						v.Local.sQTY2.Set("0")
+						f.Intrinsic.String.RPad(v.Local.sQTY2, "0", v.Args.passedQTY2, v.Local.sQTY2)
+					f.Intrinsic.Control.Else
+						f.Intrinsic.String.RPad(v.Local.sTemp(1), "0", v.Args.passedQTY2, v.Local.sQTY2)
+					f.Intrinsic.Control.EndIf
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sQTY1, V.Local.sQTY2, v.Global.sEDI_Text)
+				f.Intrinsic.Control.Else
+					'if it's 
+					f.Intrinsic.String.RPad(v.Local.sColumnNameTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+				f.Intrinsic.Control.EndIf						
+			f.Intrinsic.Control.Else
+				'If it is not 'H' it is a default value and should be padded and saved.
+				f.Intrinsic.String.Split(v.Local.sTemp, ".", v.Local.sTemp)
+					f.Intrinsic.String.LPad(v.Local.sTemp(0), "0", v.Args.passedQTY1, v.Local.sQTY1)
+					f.Intrinsic.Control.If(v.Local.sTemp(1), =, "OOB")
+						v.Local.sQTY2.Set("0")
+						f.Intrinsic.String.RPad(v.Local.sQTY2, "0", v.Args.passedQTY2, v.Local.sQTY2)
+					f.Intrinsic.Control.Else
+						f.Intrinsic.String.RPad(v.Local.sTemp(1), "0", v.Args.passedQTY2, v.Local.sQTY2)
+					f.Intrinsic.Control.EndIf
+					f.Intrinsic.String.Build("{0}{1}", v.Local.sQTY1, V.Local.sQTY2, v.Global.sEDI_Text)
+				'f.Intrinsic.String.RPad(v.Local.sColumnNameTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+			f.Intrinsic.Control.EndIf	
+		f.Intrinsic.Control.Else
+			f.Intrinsic.String.RPad(v.Local.sColumnNameTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.addEdiFieldFloat.End
+
+Program.Sub.addEdiFieldDate.Start
+v.Local.sTemp.Declare
+v.Local.sColumnNameTemp.Declare
+v.Local.sCharTest.Declare
+v.Local.iLenght.Declare
+v.Local.dTmpDate.Declare
+f.Intrinsic.Control.Try
+	v.Local.sTemp.Set("%")
+	'proccess is the same for every EDI Field.
+	'check if the customer assigned a column to this field or a default value. 
+	f.Intrinsic.Control.If(v.DataTable.columntitlesDT(v.Args.passedFieldID).FieldValue!FieldValTrim, =, "")
+		'If blank, The script will fill the space needed for EDI.
+		f.Intrinsic.String.RPad(v.Local.sTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+		f.Intrinsic.String.Replace(v.Global.sEDI_Text, "%", " ", v.Global.sEDI_Text)
+		f.Intrinsic.Control.If(v.Global.sEDI_Text.Trim, =, "")
+			v.Global.sEDI_Text.Set(" ")
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.Else
+		'set the datatable variable in a local for ease.
+		v.Local.sColumnNameTemp.Set(v.DataTable.columntitlesDT(v.Args.passedFieldID).FieldValue!FieldValTrim)
+		f.Intrinsic.Control.If(v.Local.sColumnNameTemp.Length, >, 1)
+			'get the first character.
+			f.Intrinsic.String.Left(v.Local.sColumnNameTemp, 1, v.Local.sCharTest)
+			f.Intrinsic.Control.If(v.Local.sCharTest, =, "H")
+				'If It is 'H' it might be a title. 
+				f.Intrinsic.Math.Sub(v.Local.sColumnNameTemp.Length, 1, v.Local.iLenght)
+				f.Intrinsic.String.Right(v.Local.sColumnNameTemp, v.Local.iLenght, v.Local.sTemp)
+				'check if the rest of characteres are numeric if that's the case it is a tittle.
+				f.Intrinsic.Control.If(v.Local.sTemp.IsNumeric)
+					v.Local.sTemp.Set(v.DataTable.[v.Args.passedDT](v.Args.iCntOrdersDT).[v.Local.sColumnNameTemp]!FieldVal)
+					
+					'Check Formatting
+					f.Intrinsic.Control.If(v.Global.sDateFormat.Trim, =, "1")
+						f.Intrinsic.String.LPad(v.Local.sTemp.Trim, "0", 6, v.Local.sTemp)
+						f.Intrinsic.Date.ConvertDString(v.Local.sTemp.Trim, "mmddyy", v.Local.dTmpDate)
+						f.Intrinsic.String.Format(v.Local.dTmpDate, "YYYYMMDD", v.Local.sTemp)
+						f.Intrinsic.String.RPad(v.Local.sTemp.Trim, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+						
+					f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "2")
+						f.Intrinsic.String.LPad(v.Local.sTemp.Trim, "0", 10, v.Local.sTemp)
+						f.Intrinsic.Date.ConvertDString(v.Local.sTemp.Trim, "mm/dd/yyyy", v.Local.dTmpDate)
+						f.Intrinsic.String.Format(v.Local.dTmpDate, "YYYYMMDD", v.Local.sTemp)
+						f.Intrinsic.String.RPad(v.Local.sTemp.Trim, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+						
+					f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "3")
+						f.Intrinsic.Date.ConvertDString(v.Local.sTemp.Trim, "mm/dd/yyyy hh:mm:ss", v.Local.dTmpDate)
+						f.Intrinsic.String.Format(v.Local.dTmpDate, "YYYYMMDD", v.Local.sTemp)
+						f.Intrinsic.String.RPad(v.Local.sTemp.Trim, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+						
+					f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "4")
+						f.Intrinsic.String.RPad(v.Local.sTemp.Trim, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+						
+					f.Intrinsic.Control.ElseIf(v.Global.sDateFormat.Trim, =, "5")
+						f.Intrinsic.Date.ConvertDString(v.Local.sTemp.Trim, "yyyy/mm/dd", v.Local.dTmpDate)
+						f.Intrinsic.String.Format(v.Local.dTmpDate, "YYYYMMDD", v.Local.sTemp)
+						f.Intrinsic.String.RPad(v.Local.sTemp.Trim, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+					f.Intrinsic.Control.EndIf
+					
+				f.Intrinsic.Control.Else
+					f.Intrinsic.String.RPad(v.Local.sColumnNameTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+					f.Intrinsic.String.Left(v.Global.sEDI_Text, v.Args.passedLength, v.Global.sEDI_Text)
+				f.Intrinsic.Control.EndIf						
+			f.Intrinsic.Control.ElseIf(v.Local.sCharTest, =, "#")
+				'If it is not 'H' it is a default value and should be padded and saved.	
+				f.Intrinsic.Math.Sub(v.Local.sColumnNameTemp.Length, 1, v.Local.iLenght)
+				f.Intrinsic.String.Right(v.Local.sColumnNameTemp, v.Local.iLenght, v.Local.sTemp)
+				f.Intrinsic.String.RPad(v.Local.sTemp.Trim, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+			f.Intrinsic.Control.EndIf	
+		f.Intrinsic.Control.Else
+			f.Intrinsic.Control.If(v.Local.sColumnNameTemp, =, "#")
+				v.Local.sColumnNameTemp.Set("")
+			f.Intrinsic.Control.EndIf
+			f.Intrinsic.String.RPad(v.Local.sColumnNameTemp, v.Args.fillerChar, v.Args.passedLength, v.Global.sEDI_Text)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.addEdiFieldDate.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$aanazco$}$20230929010906798$}$7aQAV3Tor/tR9bkuakHbuzQlHVuXCGOzTxeSYVyYiyyxaxwFuWUELEBdJpI5icihOODmMcEdSP4=
+Program.Sub.Comments.End
