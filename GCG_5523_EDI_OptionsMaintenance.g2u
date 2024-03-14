@@ -1,0 +1,2377 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.F_Maintenance..Create(BaseForm)
+Gui.F_Maintenance..Caption("EDI Inbound Converter Options")
+Gui.F_Maintenance..Size(19935,11550)
+Gui.F_Maintenance..MinX(19935)
+Gui.F_Maintenance..MinY(13005)
+Gui.F_Maintenance..Position(0,0)
+Gui.F_Maintenance..BackColor(-2147483633)
+Gui.F_Maintenance..MousePointer(0)
+Gui.F_Maintenance..Event(UnLoad,F_Maintenance_UnLoad)
+Gui.F_Maintenance..Event(Resize,F_Maintenance_Resize)
+Gui.F_Maintenance..AlwaysOnTop(False)
+Gui.F_Maintenance..FontName("Tahoma")
+Gui.F_Maintenance..FontSize(8.25)
+Gui.F_Maintenance..ControlBox(True)
+Gui.F_Maintenance..MaxButton(True)
+Gui.F_Maintenance..MinButton(True)
+Gui.F_Maintenance..Moveable(True)
+Gui.F_Maintenance..Sizeable(True)
+Gui.F_Maintenance..ShowInTaskBar(True)
+Gui.F_Maintenance..TitleBar(True)
+Gui.F_Maintenance.frmInput.Create(Frame)
+Gui.F_Maintenance.frmInput.Size(4005,2295)
+Gui.F_Maintenance.frmInput.Position(105,105)
+Gui.F_Maintenance.frmInput.Caption("Input")
+Gui.F_Maintenance.frmInput.Enabled(True)
+Gui.F_Maintenance.frmInput.Visible(True)
+Gui.F_Maintenance.frmInput.Zorder(0)
+Gui.F_Maintenance.frmInput.FontName("Tahoma")
+Gui.F_Maintenance.frmInput.FontSize(8.25)
+Gui.F_Maintenance.lblProfileName.Create(Label,"EDI Project Name",True,1935,255,0,150,330,True,0,"Arial",8,-2147483633,0,0)
+Gui.F_Maintenance.lblProfileName.Parent("frmInput")
+Gui.F_Maintenance.lblProfileName.BorderStyle(0)
+Gui.F_Maintenance.txtProjectName.Create(TextBox,"",True,2475,300,0,150,555,True,0,"Arial",8,-2147483643,1)
+Gui.F_Maintenance.txtProjectName.Parent("frmInput")
+Gui.F_Maintenance.txtProjectName.MaxLength(20)
+Gui.F_Maintenance.lblDefaultLocCSV.Create(Label,"Inbound File Location Folder",True,2340,255,0,150,960,True,0,"Arial",8,-2147483633,0,0)
+Gui.F_Maintenance.lblDefaultLocCSV.Parent("frmInput")
+Gui.F_Maintenance.lblDefaultLocCSV.BorderStyle(0)
+Gui.F_Maintenance.lblDefaultDestEDI.Create(Label,"EDI Default Destination Folder",True,2400,255,0,150,1575,True,0,"Arial",8,-2147483633,0,0)
+Gui.F_Maintenance.lblDefaultDestEDI.Parent("frmInput")
+Gui.F_Maintenance.lblDefaultDestEDI.BorderStyle(0)
+Gui.F_Maintenance.txtDefaultLocCSV.Create(TextBox,"",True,3300,300,0,150,1170,True,0,"Arial",8,-2147483643,1)
+Gui.F_Maintenance.txtDefaultLocCSV.Parent("frmInput")
+Gui.F_Maintenance.txtDefaultDestEDI.Create(TextBox,"",True,3240,300,0,150,1815,True,0,"Arial",8,-2147483643,1)
+Gui.F_Maintenance.txtDefaultDestEDI.Parent("frmInput")
+Gui.F_Maintenance.cmdOpen.Create(Button)
+Gui.F_Maintenance.cmdOpen.Size(1065,375)
+Gui.F_Maintenance.cmdOpen.Position(2805,540)
+Gui.F_Maintenance.cmdOpen.Parent("frmInput")
+Gui.F_Maintenance.cmdOpen.Caption("Open")
+Gui.F_Maintenance.cmdOpen.Event(Click,cmdOpen_Click)
+Gui.F_Maintenance.cmdOpen.Enabled(True)
+Gui.F_Maintenance.cmdOpen.Visible(True)
+Gui.F_Maintenance.cmdOpen.Zorder(0)
+Gui.F_Maintenance.cmdOpen.FontName("Tahoma")
+Gui.F_Maintenance.cmdOpen.FontSize(8.25)
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Create(Button)
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Size(405,375)
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Position(3510,1110)
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Parent("frmInput")
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Caption("^")
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Event(Click,cmdBwrDefaultLocCSV_Click)
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Enabled(True)
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Visible(True)
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.Zorder(0)
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.FontName("Tahoma")
+Gui.F_Maintenance.cmdBwrDefaultLocCSV.FontSize(8.25)
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Create(Button)
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Size(420,375)
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Position(3480,1755)
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Parent("frmInput")
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Caption("^")
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Event(Click,cmdBrwDefaultDestEDI_Click)
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Enabled(True)
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Visible(True)
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.Zorder(0)
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.FontName("Tahoma")
+Gui.F_Maintenance.cmdBrwDefaultDestEDI.FontSize(8.25)
+Gui.F_Maintenance.frmHeader.Create(Frame)
+Gui.F_Maintenance.frmHeader.Size(5085,7965)
+Gui.F_Maintenance.frmHeader.Position(4170,2985)
+Gui.F_Maintenance.frmHeader.Caption("Header")
+Gui.F_Maintenance.frmHeader.Enabled(False)
+Gui.F_Maintenance.frmHeader.Anchor(7)
+Gui.F_Maintenance.frmHeader.Visible(True)
+Gui.F_Maintenance.frmHeader.Zorder(0)
+Gui.F_Maintenance.frmHeader.FontName("Tahoma")
+Gui.F_Maintenance.frmHeader.FontSize(8.25)
+Gui.F_Maintenance.chkHeaderLineN.Create(CheckBox)
+Gui.F_Maintenance.chkHeaderLineN.Size(1425,300)
+Gui.F_Maintenance.chkHeaderLineN.Position(1620,570)
+Gui.F_Maintenance.chkHeaderLineN.Parent("frmHeader")
+Gui.F_Maintenance.chkHeaderLineN.Caption("N - PO Notes / Comments")
+Gui.F_Maintenance.chkHeaderLineN.Event(Click,chkHeaderLineN_Click)
+Gui.F_Maintenance.chkHeaderLineN.Enabled(True)
+Gui.F_Maintenance.chkHeaderLineN.Visible(True)
+Gui.F_Maintenance.chkHeaderLineN.Zorder(0)
+Gui.F_Maintenance.chkHeaderLineN.FontName("Tahoma")
+Gui.F_Maintenance.chkHeaderLineN.FontSize(8.25)
+Gui.F_Maintenance.GsGcHeaderFields.Create(GsGridControl)
+Gui.F_Maintenance.GsGcHeaderFields.Size(4845,6750)
+Gui.F_Maintenance.GsGcHeaderFields.Position(105,1125)
+Gui.F_Maintenance.GsGcHeaderFields.Parent("frmHeader")
+Gui.F_Maintenance.GsGcHeaderFields.Event(CellValueChanged,GsGcHeaderFields_CellValueChanged)
+Gui.F_Maintenance.GsGcHeaderFields.Anchor(15)
+Gui.F_Maintenance.GsGcHeaderFields.Enabled(True)
+Gui.F_Maintenance.GsGcHeaderFields.Visible(True)
+Gui.F_Maintenance.GsGcHeaderFields.Zorder(0)
+Gui.F_Maintenance.chkHeaderLineH.Create(CheckBox)
+Gui.F_Maintenance.chkHeaderLineH.Enabled(False)
+Gui.F_Maintenance.chkHeaderLineH.Size(1260,300)
+Gui.F_Maintenance.chkHeaderLineH.Position(120,255)
+Gui.F_Maintenance.chkHeaderLineH.Parent("frmHeader")
+Gui.F_Maintenance.chkHeaderLineH.Caption("H - Header")
+Gui.F_Maintenance.chkHeaderLineH.Value(1)
+Gui.F_Maintenance.chkHeaderLineH.Visible(True)
+Gui.F_Maintenance.chkHeaderLineH.Zorder(0)
+Gui.F_Maintenance.chkHeaderLineH.FontName("Tahoma")
+Gui.F_Maintenance.chkHeaderLineH.FontSize(8.25)
+Gui.F_Maintenance.chkHeaderLineA.Create(CheckBox)
+Gui.F_Maintenance.chkHeaderLineA.Size(1290,300)
+Gui.F_Maintenance.chkHeaderLineA.Position(1605,270)
+Gui.F_Maintenance.chkHeaderLineA.Parent("frmHeader")
+Gui.F_Maintenance.chkHeaderLineA.Caption("A - PO Main")
+Gui.F_Maintenance.chkHeaderLineA.Event(Click,chkHeaderLineA_Click)
+Gui.F_Maintenance.chkHeaderLineA.Enabled(True)
+Gui.F_Maintenance.chkHeaderLineA.Visible(True)
+Gui.F_Maintenance.chkHeaderLineA.Zorder(0)
+Gui.F_Maintenance.chkHeaderLineA.FontName("Tahoma")
+Gui.F_Maintenance.chkHeaderLineA.FontSize(8.25)
+Gui.F_Maintenance.chkHeaderLineB.Create(CheckBox)
+Gui.F_Maintenance.chkHeaderLineB.Size(1425,300)
+Gui.F_Maintenance.chkHeaderLineB.Position(3030,270)
+Gui.F_Maintenance.chkHeaderLineB.Parent("frmHeader")
+Gui.F_Maintenance.chkHeaderLineB.Caption("B - PO Bill To Data")
+Gui.F_Maintenance.chkHeaderLineB.Event(Click,chkHeaderLineB_Click)
+Gui.F_Maintenance.chkHeaderLineB.Enabled(True)
+Gui.F_Maintenance.chkHeaderLineB.Visible(True)
+Gui.F_Maintenance.chkHeaderLineB.Zorder(0)
+Gui.F_Maintenance.chkHeaderLineB.FontName("Tahoma")
+Gui.F_Maintenance.chkHeaderLineB.FontSize(8.25)
+Gui.F_Maintenance.chkHeaderLineC.Create(CheckBox)
+Gui.F_Maintenance.chkHeaderLineC.Size(1485,300)
+Gui.F_Maintenance.chkHeaderLineC.Position(105,660)
+Gui.F_Maintenance.chkHeaderLineC.Parent("frmHeader")
+Gui.F_Maintenance.chkHeaderLineC.Caption("C - PO Ship to Data")
+Gui.F_Maintenance.chkHeaderLineC.Event(Click,chkHeaderLineC_Click)
+Gui.F_Maintenance.chkHeaderLineC.Enabled(True)
+Gui.F_Maintenance.chkHeaderLineC.Visible(True)
+Gui.F_Maintenance.chkHeaderLineC.Zorder(0)
+Gui.F_Maintenance.chkHeaderLineC.FontName("Tahoma")
+Gui.F_Maintenance.chkHeaderLineC.FontSize(8.25)
+Gui.F_Maintenance.cmdHeaderSelectFields.Create(Button)
+Gui.F_Maintenance.cmdHeaderSelectFields.Size(1920,450)
+Gui.F_Maintenance.cmdHeaderSelectFields.Position(3060,570)
+Gui.F_Maintenance.cmdHeaderSelectFields.Parent("frmHeader")
+Gui.F_Maintenance.cmdHeaderSelectFields.Caption("Select Fields")
+Gui.F_Maintenance.cmdHeaderSelectFields.Event(Click,cmdHeaderSelectFields_Click)
+Gui.F_Maintenance.cmdHeaderSelectFields.Enabled(True)
+Gui.F_Maintenance.cmdHeaderSelectFields.Visible(True)
+Gui.F_Maintenance.cmdHeaderSelectFields.Zorder(0)
+Gui.F_Maintenance.cmdHeaderSelectFields.FontName("Tahoma")
+Gui.F_Maintenance.cmdHeaderSelectFields.FontSize(8.25)
+Gui.F_Maintenance.frmLine.Create(Frame)
+Gui.F_Maintenance.frmLine.Size(5085,7965)
+Gui.F_Maintenance.frmLine.Position(9345,2985)
+Gui.F_Maintenance.frmLine.Caption("Line")
+Gui.F_Maintenance.frmLine.Enabled(False)
+Gui.F_Maintenance.frmLine.Anchor(3)
+Gui.F_Maintenance.frmLine.Visible(True)
+Gui.F_Maintenance.frmLine.Zorder(0)
+Gui.F_Maintenance.frmLine.FontName("Tahoma")
+Gui.F_Maintenance.frmLine.FontSize(8.25)
+Gui.F_Maintenance.chkLine1.Create(CheckBox)
+Gui.F_Maintenance.chkLine1.Enabled(False)
+Gui.F_Maintenance.chkLine1.Size(1605,300)
+Gui.F_Maintenance.chkLine1.Position(120,225)
+Gui.F_Maintenance.chkLine1.Parent("frmLine")
+Gui.F_Maintenance.chkLine1.Caption("1 - PO Line Data")
+Gui.F_Maintenance.chkLine1.Value(1)
+Gui.F_Maintenance.chkLine1.Visible(True)
+Gui.F_Maintenance.chkLine1.Zorder(0)
+Gui.F_Maintenance.chkLine1.FontName("Tahoma")
+Gui.F_Maintenance.chkLine1.FontSize(8.25)
+Gui.F_Maintenance.chkLine2.Create(CheckBox)
+Gui.F_Maintenance.chkLine2.Size(1965,300)
+Gui.F_Maintenance.chkLine2.Position(1755,225)
+Gui.F_Maintenance.chkLine2.Parent("frmLine")
+Gui.F_Maintenance.chkLine2.Caption("2 - PO Line Data Continued")
+Gui.F_Maintenance.chkLine2.Event(Click,chkLine2_Click)
+Gui.F_Maintenance.chkLine2.Enabled(True)
+Gui.F_Maintenance.chkLine2.Visible(True)
+Gui.F_Maintenance.chkLine2.Zorder(0)
+Gui.F_Maintenance.chkLine2.FontName("Tahoma")
+Gui.F_Maintenance.chkLine2.FontSize(8.25)
+Gui.F_Maintenance.chkLineN.Create(CheckBox)
+Gui.F_Maintenance.chkLineN.Size(2205,300)
+Gui.F_Maintenance.chkLineN.Position(120,600)
+Gui.F_Maintenance.chkLineN.Parent("frmLine")
+Gui.F_Maintenance.chkLineN.Caption("N - PO Notes / Comments")
+Gui.F_Maintenance.chkLineN.Event(Click,chkLineN_Click)
+Gui.F_Maintenance.chkLineN.Enabled(True)
+Gui.F_Maintenance.chkLineN.Visible(True)
+Gui.F_Maintenance.chkLineN.Zorder(0)
+Gui.F_Maintenance.chkLineN.FontName("Tahoma")
+Gui.F_Maintenance.chkLineN.FontSize(8.25)
+Gui.F_Maintenance.cmdLineSelectFields.Create(Button)
+Gui.F_Maintenance.cmdLineSelectFields.Size(1920,450)
+Gui.F_Maintenance.cmdLineSelectFields.Position(3030,540)
+Gui.F_Maintenance.cmdLineSelectFields.Parent("frmLine")
+Gui.F_Maintenance.cmdLineSelectFields.Caption("Select Fields")
+Gui.F_Maintenance.cmdLineSelectFields.Event(Click,cmdLineSelectFields_Click)
+Gui.F_Maintenance.cmdLineSelectFields.Enabled(True)
+Gui.F_Maintenance.cmdLineSelectFields.Visible(True)
+Gui.F_Maintenance.cmdLineSelectFields.Zorder(0)
+Gui.F_Maintenance.cmdLineSelectFields.FontName("Tahoma")
+Gui.F_Maintenance.cmdLineSelectFields.FontSize(8.25)
+Gui.F_Maintenance.GsGcLineFields.Create(GsGridControl)
+Gui.F_Maintenance.GsGcLineFields.Size(4845,6720)
+Gui.F_Maintenance.GsGcLineFields.Position(105,1125)
+Gui.F_Maintenance.GsGcLineFields.Parent("frmLine")
+Gui.F_Maintenance.GsGcLineFields.Event(CellValueChanged,GsGcLineFields_CellValueChanged)
+Gui.F_Maintenance.GsGcLineFields.Anchor(15)
+Gui.F_Maintenance.GsGcLineFields.Enabled(True)
+Gui.F_Maintenance.GsGcLineFields.Visible(True)
+Gui.F_Maintenance.GsGcLineFields.Zorder(0)
+Gui.F_Maintenance.frmShipSchedule.Create(Frame)
+Gui.F_Maintenance.frmShipSchedule.Size(5085,7965)
+Gui.F_Maintenance.frmShipSchedule.Position(14520,2985)
+Gui.F_Maintenance.frmShipSchedule.Caption("Ship Schedule")
+Gui.F_Maintenance.frmShipSchedule.Enabled(False)
+Gui.F_Maintenance.frmShipSchedule.Anchor(3)
+Gui.F_Maintenance.frmShipSchedule.Visible(True)
+Gui.F_Maintenance.frmShipSchedule.Zorder(0)
+Gui.F_Maintenance.frmShipSchedule.FontName("Tahoma")
+Gui.F_Maintenance.frmShipSchedule.FontSize(8.25)
+Gui.F_Maintenance.chkShipSchedM.Create(CheckBox)
+Gui.F_Maintenance.chkShipSchedM.Size(2490,300)
+Gui.F_Maintenance.chkShipSchedM.Position(180,615)
+Gui.F_Maintenance.chkShipSchedM.Parent("frmShipSchedule")
+Gui.F_Maintenance.chkShipSchedM.Caption("M - PO Line Schedule Data")
+Gui.F_Maintenance.chkShipSchedM.Event(Click,chkShipSchedM_Click)
+Gui.F_Maintenance.chkShipSchedM.Enabled(True)
+Gui.F_Maintenance.chkShipSchedM.Visible(True)
+Gui.F_Maintenance.chkShipSchedM.Zorder(0)
+Gui.F_Maintenance.chkShipSchedM.FontName("Tahoma")
+Gui.F_Maintenance.chkShipSchedM.FontSize(8.25)
+Gui.F_Maintenance.cmdShipSchedSelectFields.Create(Button)
+Gui.F_Maintenance.cmdShipSchedSelectFields.Size(1920,450)
+Gui.F_Maintenance.cmdShipSchedSelectFields.Position(3015,540)
+Gui.F_Maintenance.cmdShipSchedSelectFields.Parent("frmShipSchedule")
+Gui.F_Maintenance.cmdShipSchedSelectFields.Caption("Select Fields")
+Gui.F_Maintenance.cmdShipSchedSelectFields.Event(Click,cmdShipSchedSelectFields_Click)
+Gui.F_Maintenance.cmdShipSchedSelectFields.Enabled(False)
+Gui.F_Maintenance.cmdShipSchedSelectFields.Visible(True)
+Gui.F_Maintenance.cmdShipSchedSelectFields.Zorder(0)
+Gui.F_Maintenance.cmdShipSchedSelectFields.FontName("Tahoma")
+Gui.F_Maintenance.cmdShipSchedSelectFields.FontSize(8.25)
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Create(GsGridControl)
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Size(4845,6750)
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Position(105,1125)
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Parent("frmShipSchedule")
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Event(CellValueChanged,GsGcShipSchedSelectFields_CellValueChanged)
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Anchor(15)
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Enabled(True)
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Visible(True)
+Gui.F_Maintenance.GsGcShipSchedSelectFields.Zorder(0)
+Gui.F_Maintenance.frmFormat.Create(Frame)
+Gui.F_Maintenance.frmFormat.Size(4005,8145)
+Gui.F_Maintenance.frmFormat.Position(105,2445)
+Gui.F_Maintenance.frmFormat.Caption("Profile")
+Gui.F_Maintenance.frmFormat.Enabled(True)
+Gui.F_Maintenance.frmFormat.Visible(True)
+Gui.F_Maintenance.frmFormat.Zorder(0)
+Gui.F_Maintenance.frmFormat.FontName("Tahoma")
+Gui.F_Maintenance.frmFormat.FontSize(8.25)
+Gui.F_Maintenance.frmGroupFormat.Create(Frame)
+Gui.F_Maintenance.frmGroupFormat.Size(3750,2880)
+Gui.F_Maintenance.frmGroupFormat.Position(105,3015)
+Gui.F_Maintenance.frmGroupFormat.Parent("frmFormat")
+Gui.F_Maintenance.frmGroupFormat.Caption("Group Format")
+Gui.F_Maintenance.frmGroupFormat.Enabled(True)
+Gui.F_Maintenance.frmGroupFormat.Visible(True)
+Gui.F_Maintenance.frmGroupFormat.Zorder(0)
+Gui.F_Maintenance.frmGroupFormat.FontName("Tahoma")
+Gui.F_Maintenance.frmGroupFormat.FontSize(8.25)
+Gui.F_Maintenance.lbl4.Create(Label,"Group Header Lines By:",True,1935,255,0,135,270,True,0,"Arial",8,-2147483633,0,0)
+Gui.F_Maintenance.lbl4.Parent("frmGroupFormat")
+Gui.F_Maintenance.lbl4.BorderStyle(0)
+Gui.F_Maintenance.chk_H-PO_Number.Create(CheckBox)
+Gui.F_Maintenance.chk_H-PO_Number.Size(1560,300)
+Gui.F_Maintenance.chk_H-PO_Number.Position(135,810)
+Gui.F_Maintenance.chk_H-PO_Number.Parent("frmGroupFormat")
+Gui.F_Maintenance.chk_H-PO_Number.Caption("H-PO-Number")
+Gui.F_Maintenance.chk_H-PO_Number.Enabled(True)
+Gui.F_Maintenance.chk_H-PO_Number.Visible(True)
+Gui.F_Maintenance.chk_H-PO_Number.Zorder(0)
+Gui.F_Maintenance.chk_H-PO_Number.FontName("Tahoma")
+Gui.F_Maintenance.chk_H-PO_Number.FontSize(8.25)
+Gui.F_Maintenance.chk_H-DueDate.Create(CheckBox)
+Gui.F_Maintenance.chk_H-DueDate.Size(1560,300)
+Gui.F_Maintenance.chk_H-DueDate.Position(135,1365)
+Gui.F_Maintenance.chk_H-DueDate.Parent("frmGroupFormat")
+Gui.F_Maintenance.chk_H-DueDate.Caption("H-Due_Date")
+Gui.F_Maintenance.chk_H-DueDate.Enabled(True)
+Gui.F_Maintenance.chk_H-DueDate.Visible(True)
+Gui.F_Maintenance.chk_H-DueDate.Zorder(0)
+Gui.F_Maintenance.chk_H-DueDate.FontName("Tahoma")
+Gui.F_Maintenance.chk_H-DueDate.FontSize(8.25)
+Gui.F_Maintenance.chk_H-BuyerID.Create(CheckBox)
+Gui.F_Maintenance.chk_H-BuyerID.Size(1560,300)
+Gui.F_Maintenance.chk_H-BuyerID.Position(135,510)
+Gui.F_Maintenance.chk_H-BuyerID.Parent("frmGroupFormat")
+Gui.F_Maintenance.chk_H-BuyerID.Caption("H-Buyer-ID")
+Gui.F_Maintenance.chk_H-BuyerID.Enabled(True)
+Gui.F_Maintenance.chk_H-BuyerID.Visible(True)
+Gui.F_Maintenance.chk_H-BuyerID.Zorder(0)
+Gui.F_Maintenance.chk_H-BuyerID.FontName("Tahoma")
+Gui.F_Maintenance.chk_H-BuyerID.FontSize(8.25)
+Gui.F_Maintenance.chk_H-Ship-To.Create(CheckBox)
+Gui.F_Maintenance.chk_H-Ship-To.Size(1560,300)
+Gui.F_Maintenance.chk_H-Ship-To.Position(135,1080)
+Gui.F_Maintenance.chk_H-Ship-To.Parent("frmGroupFormat")
+Gui.F_Maintenance.chk_H-Ship-To.Caption("H-Ship-To")
+Gui.F_Maintenance.chk_H-Ship-To.Enabled(True)
+Gui.F_Maintenance.chk_H-Ship-To.Visible(True)
+Gui.F_Maintenance.chk_H-Ship-To.Zorder(0)
+Gui.F_Maintenance.chk_H-Ship-To.FontName("Tahoma")
+Gui.F_Maintenance.chk_H-Ship-To.FontSize(8.25)
+Gui.F_Maintenance.chk_L-User1.Create(CheckBox)
+Gui.F_Maintenance.chk_L-User1.Size(1560,300)
+Gui.F_Maintenance.chk_L-User1.Position(135,2565)
+Gui.F_Maintenance.chk_L-User1.Parent("frmGroupFormat")
+Gui.F_Maintenance.chk_L-User1.Caption("L-User_1")
+Gui.F_Maintenance.chk_L-User1.Enabled(True)
+Gui.F_Maintenance.chk_L-User1.Visible(True)
+Gui.F_Maintenance.chk_L-User1.Zorder(0)
+Gui.F_Maintenance.chk_L-User1.FontName("Tahoma")
+Gui.F_Maintenance.chk_L-User1.FontSize(8.25)
+Gui.F_Maintenance.chk_L-PartNum.Create(CheckBox)
+Gui.F_Maintenance.chk_L-PartNum.Size(1560,300)
+Gui.F_Maintenance.chk_L-PartNum.Position(135,2010)
+Gui.F_Maintenance.chk_L-PartNum.Parent("frmGroupFormat")
+Gui.F_Maintenance.chk_L-PartNum.Caption("L-Part-Number")
+Gui.F_Maintenance.chk_L-PartNum.Enabled(True)
+Gui.F_Maintenance.chk_L-PartNum.Visible(True)
+Gui.F_Maintenance.chk_L-PartNum.Zorder(0)
+Gui.F_Maintenance.chk_L-PartNum.FontName("Tahoma")
+Gui.F_Maintenance.chk_L-PartNum.FontSize(8.25)
+Gui.F_Maintenance.lbl5.Create(Label,"Group Lines By:",True,1935,255,0,150,1770,True,0,"Arial",8,-2147483633,0,0)
+Gui.F_Maintenance.lbl5.Parent("frmGroupFormat")
+Gui.F_Maintenance.lbl5.BorderStyle(0)
+Gui.F_Maintenance.chk_L-PO-LineNbr.Create(CheckBox)
+Gui.F_Maintenance.chk_L-PO-LineNbr.Size(1560,300)
+Gui.F_Maintenance.chk_L-PO-LineNbr.Position(135,2295)
+Gui.F_Maintenance.chk_L-PO-LineNbr.Parent("frmGroupFormat")
+Gui.F_Maintenance.chk_L-PO-LineNbr.Caption("L-PO-Line-Nbr")
+Gui.F_Maintenance.chk_L-PO-LineNbr.Enabled(True)
+Gui.F_Maintenance.chk_L-PO-LineNbr.Visible(True)
+Gui.F_Maintenance.chk_L-PO-LineNbr.Zorder(0)
+Gui.F_Maintenance.chk_L-PO-LineNbr.FontName("Tahoma")
+Gui.F_Maintenance.chk_L-PO-LineNbr.FontSize(8.25)
+Gui.F_Maintenance.frmNameFormat.Create(Frame)
+Gui.F_Maintenance.frmNameFormat.Size(3750,2265)
+Gui.F_Maintenance.frmNameFormat.Position(105,720)
+Gui.F_Maintenance.frmNameFormat.Parent("frmFormat")
+Gui.F_Maintenance.frmNameFormat.Caption("Name Format")
+Gui.F_Maintenance.frmNameFormat.Enabled(True)
+Gui.F_Maintenance.frmNameFormat.Visible(True)
+Gui.F_Maintenance.frmNameFormat.Zorder(0)
+Gui.F_Maintenance.frmNameFormat.FontName("Tahoma")
+Gui.F_Maintenance.frmNameFormat.FontSize(8.25)
+Gui.F_Maintenance.lblNameExample.Create(Label,"EDI850",True,3480,405,0,120,300,True,0,"Arial",7,-2147483633,0,0)
+Gui.F_Maintenance.lblNameExample.Parent("frmNameFormat")
+Gui.F_Maintenance.lblNameExample.FontStyle(True,True,False,False,False)
+Gui.F_Maintenance.lblNameExample.ForeColor(-2147483622)
+Gui.F_Maintenance.lblNameExample.BorderStyle(0)
+Gui.F_Maintenance.chkAddUsername.Create(CheckBox)
+Gui.F_Maintenance.chkAddUsername.Size(1560,300)
+Gui.F_Maintenance.chkAddUsername.Position(135,1005)
+Gui.F_Maintenance.chkAddUsername.Parent("frmNameFormat")
+Gui.F_Maintenance.chkAddUsername.Caption("Add Username")
+Gui.F_Maintenance.chkAddUsername.Event(Click,changelNameLabel)
+Gui.F_Maintenance.chkAddUsername.Enabled(True)
+Gui.F_Maintenance.chkAddUsername.Visible(True)
+Gui.F_Maintenance.chkAddUsername.Zorder(0)
+Gui.F_Maintenance.chkAddUsername.FontName("Tahoma")
+Gui.F_Maintenance.chkAddUsername.FontSize(8.25)
+Gui.F_Maintenance.chkAddTerminal.Create(CheckBox)
+Gui.F_Maintenance.chkAddTerminal.Size(1560,300)
+Gui.F_Maintenance.chkAddTerminal.Position(135,1305)
+Gui.F_Maintenance.chkAddTerminal.Parent("frmNameFormat")
+Gui.F_Maintenance.chkAddTerminal.Caption("Add Terminal")
+Gui.F_Maintenance.chkAddTerminal.Event(Click,changelNameLabel)
+Gui.F_Maintenance.chkAddTerminal.Enabled(True)
+Gui.F_Maintenance.chkAddTerminal.Visible(True)
+Gui.F_Maintenance.chkAddTerminal.Zorder(0)
+Gui.F_Maintenance.chkAddTerminal.FontName("Tahoma")
+Gui.F_Maintenance.chkAddTerminal.FontSize(8.25)
+Gui.F_Maintenance.chkAddDate.Create(CheckBox)
+Gui.F_Maintenance.chkAddDate.Size(1560,300)
+Gui.F_Maintenance.chkAddDate.Position(135,1605)
+Gui.F_Maintenance.chkAddDate.Parent("frmNameFormat")
+Gui.F_Maintenance.chkAddDate.Caption("Add Date")
+Gui.F_Maintenance.chkAddDate.Event(Click,changelNameLabel)
+Gui.F_Maintenance.chkAddDate.Enabled(True)
+Gui.F_Maintenance.chkAddDate.Visible(True)
+Gui.F_Maintenance.chkAddDate.Zorder(0)
+Gui.F_Maintenance.chkAddDate.FontName("Tahoma")
+Gui.F_Maintenance.chkAddDate.FontSize(8.25)
+Gui.F_Maintenance.chkAddTimeStamp.Create(CheckBox)
+Gui.F_Maintenance.chkAddTimeStamp.Size(2190,300)
+Gui.F_Maintenance.chkAddTimeStamp.Position(135,1905)
+Gui.F_Maintenance.chkAddTimeStamp.Parent("frmNameFormat")
+Gui.F_Maintenance.chkAddTimeStamp.Caption("Add Time Stamp")
+Gui.F_Maintenance.chkAddTimeStamp.Event(Click,changelNameLabel)
+Gui.F_Maintenance.chkAddTimeStamp.Enabled(True)
+Gui.F_Maintenance.chkAddTimeStamp.Visible(True)
+Gui.F_Maintenance.chkAddTimeStamp.Zorder(0)
+Gui.F_Maintenance.chkAddTimeStamp.FontName("Tahoma")
+Gui.F_Maintenance.chkAddTimeStamp.FontSize(8.25)
+Gui.F_Maintenance.chkAddProjectName.Create(CheckBox)
+Gui.F_Maintenance.chkAddProjectName.Size(1785,300)
+Gui.F_Maintenance.chkAddProjectName.Position(135,705)
+Gui.F_Maintenance.chkAddProjectName.Parent("frmNameFormat")
+Gui.F_Maintenance.chkAddProjectName.Caption("Add Project Name")
+Gui.F_Maintenance.chkAddProjectName.Event(Click,changelNameLabel)
+Gui.F_Maintenance.chkAddProjectName.Enabled(True)
+Gui.F_Maintenance.chkAddProjectName.Visible(True)
+Gui.F_Maintenance.chkAddProjectName.Zorder(0)
+Gui.F_Maintenance.chkAddProjectName.FontName("Tahoma")
+Gui.F_Maintenance.chkAddProjectName.FontSize(8.25)
+Gui.F_Maintenance.frmDateFormat.Create(Frame)
+Gui.F_Maintenance.frmDateFormat.Size(3750,1785)
+Gui.F_Maintenance.frmDateFormat.Position(105,5970)
+Gui.F_Maintenance.frmDateFormat.Parent("frmFormat")
+Gui.F_Maintenance.frmDateFormat.Caption("Date Format")
+Gui.F_Maintenance.frmDateFormat.Enabled(True)
+Gui.F_Maintenance.frmDateFormat.Visible(True)
+Gui.F_Maintenance.frmDateFormat.Zorder(0)
+Gui.F_Maintenance.frmDateFormat.FontName("Tahoma")
+Gui.F_Maintenance.frmDateFormat.FontSize(8.25)
+Gui.F_Maintenance.optDateFormat2.Create(Option)
+Gui.F_Maintenance.optDateFormat2.Size(1575,255)
+Gui.F_Maintenance.optDateFormat2.Position(195,660)
+Gui.F_Maintenance.optDateFormat2.Parent("frmDateFormat")
+Gui.F_Maintenance.optDateFormat2.Caption("mm/dd/yyyy")
+Gui.F_Maintenance.optDateFormat2.Event(Click,optDateFormat2_Click)
+Gui.F_Maintenance.optDateFormat2.Enabled(True)
+Gui.F_Maintenance.optDateFormat2.Visible(True)
+Gui.F_Maintenance.optDateFormat2.Zorder(0)
+Gui.F_Maintenance.optDateFormat2.FontName("Tahoma")
+Gui.F_Maintenance.optDateFormat2.FontSize(8.25)
+Gui.F_Maintenance.optDateFormat3.Create(Option)
+Gui.F_Maintenance.optDateFormat3.Size(2700,255)
+Gui.F_Maintenance.optDateFormat3.Position(195,930)
+Gui.F_Maintenance.optDateFormat3.Parent("frmDateFormat")
+Gui.F_Maintenance.optDateFormat3.Caption("mm/dd/yyyy hh:mm:ss")
+Gui.F_Maintenance.optDateFormat3.Event(Click,optDateFormat3_Click)
+Gui.F_Maintenance.optDateFormat3.Enabled(True)
+Gui.F_Maintenance.optDateFormat3.Visible(True)
+Gui.F_Maintenance.optDateFormat3.Zorder(0)
+Gui.F_Maintenance.optDateFormat3.FontName("Tahoma")
+Gui.F_Maintenance.optDateFormat3.FontSize(8.25)
+Gui.F_Maintenance.optDateFormat4.Create(Option)
+Gui.F_Maintenance.optDateFormat4.Size(2700,255)
+Gui.F_Maintenance.optDateFormat4.Position(210,1230)
+Gui.F_Maintenance.optDateFormat4.Parent("frmDateFormat")
+Gui.F_Maintenance.optDateFormat4.Caption("yyyyddmm")
+Gui.F_Maintenance.optDateFormat4.Event(Click,optDateFormat4_Click)
+Gui.F_Maintenance.optDateFormat4.Enabled(True)
+Gui.F_Maintenance.optDateFormat4.Visible(True)
+Gui.F_Maintenance.optDateFormat4.Zorder(0)
+Gui.F_Maintenance.optDateFormat4.FontName("Tahoma")
+Gui.F_Maintenance.optDateFormat4.FontSize(8.25)
+Gui.F_Maintenance.optDateFormat5.Create(Option)
+Gui.F_Maintenance.optDateFormat5.Enabled(True)
+Gui.F_Maintenance.optDateFormat5.Visible(True)
+Gui.F_Maintenance.optDateFormat5.Zorder(0)
+Gui.F_Maintenance.optDateFormat5.Size(2700,255)
+Gui.F_Maintenance.optDateFormat5.Position(210,1560)
+Gui.F_Maintenance.optDateFormat5.Caption("yyyy/mm/dd")
+Gui.F_Maintenance.optDateFormat5.FontName("Tahoma")
+Gui.F_Maintenance.optDateFormat5.FontSize(8.25)
+Gui.F_Maintenance.optDateFormat5.Parent("frmDateFormat")
+Gui.F_Maintenance.optDateFormat5.Event(Click,optDateFormat5_Click)
+Gui.F_Maintenance.optDateFormat1.Create(Option)
+Gui.F_Maintenance.optDateFormat1.Size(1575,255)
+Gui.F_Maintenance.optDateFormat1.Position(195,360)
+Gui.F_Maintenance.optDateFormat1.Parent("frmDateFormat")
+Gui.F_Maintenance.optDateFormat1.Caption("mmddyy")
+Gui.F_Maintenance.optDateFormat1.Event(Click,optDateFormat1_Click)
+Gui.F_Maintenance.optDateFormat1.Enabled(True)
+Gui.F_Maintenance.optDateFormat1.Visible(True)
+Gui.F_Maintenance.optDateFormat1.Zorder(0)
+Gui.F_Maintenance.optDateFormat1.FontName("Tahoma")
+Gui.F_Maintenance.optDateFormat1.FontSize(8.25)
+Gui.F_Maintenance.cboProfile.Create(ComboBox)
+Gui.F_Maintenance.cboProfile.Size(2850,330)
+Gui.F_Maintenance.cboProfile.Position(135,270)
+Gui.F_Maintenance.cboProfile.Parent("frmFormat")
+Gui.F_Maintenance.cboProfile.Enabled(True)
+Gui.F_Maintenance.cboProfile.Visible(True)
+Gui.F_Maintenance.cboProfile.Zorder(0)
+Gui.F_Maintenance.cboProfile.FontName("Tahoma")
+Gui.F_Maintenance.cboProfile.FontSize(8.25)
+Gui.F_Maintenance.chkRowTitles.Create(CheckBox)
+Gui.F_Maintenance.chkRowTitles.Size(3585,300)
+Gui.F_Maintenance.chkRowTitles.Position(150,7770)
+Gui.F_Maintenance.chkRowTitles.Parent("frmFormat")
+Gui.F_Maintenance.chkRowTitles.Caption("First Row Contains Titles")
+Gui.F_Maintenance.chkRowTitles.Enabled(True)
+Gui.F_Maintenance.chkRowTitles.Visible(True)
+Gui.F_Maintenance.chkRowTitles.Zorder(0)
+Gui.F_Maintenance.chkRowTitles.FontName("Tahoma")
+Gui.F_Maintenance.chkRowTitles.FontSize(8.25)
+Gui.F_Maintenance.cmdChekProfiles.Create(Button)
+Gui.F_Maintenance.cmdChekProfiles.Size(825,375)
+Gui.F_Maintenance.cmdChekProfiles.Position(3075,255)
+Gui.F_Maintenance.cmdChekProfiles.Parent("frmFormat")
+Gui.F_Maintenance.cmdChekProfiles.Caption("Check")
+Gui.F_Maintenance.cmdChekProfiles.Event(Click,checkProfiles)
+Gui.F_Maintenance.cmdChekProfiles.Enabled(True)
+Gui.F_Maintenance.cmdChekProfiles.Visible(True)
+Gui.F_Maintenance.cmdChekProfiles.Zorder(0)
+Gui.F_Maintenance.cmdChekProfiles.FontName("Tahoma")
+Gui.F_Maintenance.cmdChekProfiles.FontSize(8.25)
+Gui.F_Maintenance.frmFieldtitles.Create(Frame)
+Gui.F_Maintenance.frmFieldtitles.Size(15420,2760)
+Gui.F_Maintenance.frmFieldtitles.Position(4170,120)
+Gui.F_Maintenance.frmFieldtitles.Caption("Field titles")
+Gui.F_Maintenance.frmFieldtitles.Anchor(13)
+Gui.F_Maintenance.frmFieldtitles.Enabled(True)
+Gui.F_Maintenance.frmFieldtitles.Visible(True)
+Gui.F_Maintenance.frmFieldtitles.Zorder(0)
+Gui.F_Maintenance.frmFieldtitles.FontName("Tahoma")
+Gui.F_Maintenance.frmFieldtitles.FontSize(8.25)
+Gui.F_Maintenance.GsGcFieldtitles.Create(GsGridControl)
+Gui.F_Maintenance.GsGcFieldtitles.Size(15300,1980)
+Gui.F_Maintenance.GsGcFieldtitles.Position(60,645)
+Gui.F_Maintenance.GsGcFieldtitles.Parent("frmFieldtitles")
+Gui.F_Maintenance.GsGcFieldtitles.Anchor(15)
+Gui.F_Maintenance.GsGcFieldtitles.Enabled(True)
+Gui.F_Maintenance.GsGcFieldtitles.Visible(True)
+Gui.F_Maintenance.GsGcFieldtitles.Zorder(0)
+Gui.F_Maintenance.txttitlesFileLocation.Create(TextBox,"",True,6075,300,0,90,240,True,0,"Arial",8,-2147483643,1)
+Gui.F_Maintenance.txttitlesFileLocation.Parent("frmFieldtitles")
+Gui.F_Maintenance.cmdFieldtitlesUpload.Create(Button)
+Gui.F_Maintenance.cmdFieldtitlesUpload.Size(855,375)
+Gui.F_Maintenance.cmdFieldtitlesUpload.Position(6765,195)
+Gui.F_Maintenance.cmdFieldtitlesUpload.Parent("frmFieldtitles")
+Gui.F_Maintenance.cmdFieldtitlesUpload.Caption("Upload")
+Gui.F_Maintenance.cmdFieldtitlesUpload.Event(Click,cmdFieldtitlesUpload_Click)
+Gui.F_Maintenance.cmdFieldtitlesUpload.Enabled(True)
+Gui.F_Maintenance.cmdFieldtitlesUpload.Visible(True)
+Gui.F_Maintenance.cmdFieldtitlesUpload.Zorder(0)
+Gui.F_Maintenance.cmdFieldtitlesUpload.FontName("Tahoma")
+Gui.F_Maintenance.cmdFieldtitlesUpload.FontSize(8.25)
+Gui.F_Maintenance.cmdBrwFieldtitles.Create(Button)
+Gui.F_Maintenance.cmdBrwFieldtitles.Size(435,375)
+Gui.F_Maintenance.cmdBrwFieldtitles.Position(6240,195)
+Gui.F_Maintenance.cmdBrwFieldtitles.Parent("frmFieldtitles")
+Gui.F_Maintenance.cmdBrwFieldtitles.Caption("^")
+Gui.F_Maintenance.cmdBrwFieldtitles.Event(Click,cmdBrwFieldtitles_Click)
+Gui.F_Maintenance.cmdBrwFieldtitles.Enabled(True)
+Gui.F_Maintenance.cmdBrwFieldtitles.Visible(True)
+Gui.F_Maintenance.cmdBrwFieldtitles.Zorder(0)
+Gui.F_Maintenance.cmdBrwFieldtitles.FontName("Tahoma")
+Gui.F_Maintenance.cmdBrwFieldtitles.FontSize(8.25)
+Gui.F_Maintenance.txtPreProcessor.Create(TextBox,"",True,3450,300,0,11400,210,True,0,"Arial",8,-2147483643,1)
+Gui.F_Maintenance.txtPreProcessor.Parent("frmFieldtitles")
+Gui.F_Maintenance.cmdPreProcBrw.Create(Button)
+Gui.F_Maintenance.cmdPreProcBrw.Enabled(True)
+Gui.F_Maintenance.cmdPreProcBrw.Visible(True)
+Gui.F_Maintenance.cmdPreProcBrw.Zorder(0)
+Gui.F_Maintenance.cmdPreProcBrw.Size(435,375)
+Gui.F_Maintenance.cmdPreProcBrw.Position(14895,180)
+Gui.F_Maintenance.cmdPreProcBrw.Caption("^")
+Gui.F_Maintenance.cmdPreProcBrw.FontName("Tahoma")
+Gui.F_Maintenance.cmdPreProcBrw.FontSize(8.25)
+Gui.F_Maintenance.cmdPreProcBrw.Parent("frmFieldtitles")
+Gui.F_Maintenance.cmdPreProcBrw.Event(Click,cmdPreProcBrw_Click)
+Gui.F_Maintenance.chk1.Create(CheckBox)
+Gui.F_Maintenance.chk1.Enabled(True)
+Gui.F_Maintenance.chk1.Visible(True)
+Gui.F_Maintenance.chk1.Zorder(0)
+Gui.F_Maintenance.chk1.Size(1590,300)
+Gui.F_Maintenance.chk1.Position(9675,225)
+Gui.F_Maintenance.chk1.Caption("Use PreProcessor")
+Gui.F_Maintenance.chk1.FontName("Tahoma")
+Gui.F_Maintenance.chk1.FontSize(8.25)
+Gui.F_Maintenance.chk1.Parent("frmFieldtitles")
+Gui.F_Maintenance.cmdSaveProfile.Create(Button)
+Gui.F_Maintenance.cmdSaveProfile.Size(1230,345)
+Gui.F_Maintenance.cmdSaveProfile.Position(2850,10665)
+Gui.F_Maintenance.cmdSaveProfile.Caption("Save Profile")
+Gui.F_Maintenance.cmdSaveProfile.Event(Click,cmdSaveProfile_Click)
+Gui.F_Maintenance.cmdSaveProfile.Enabled(True)
+Gui.F_Maintenance.cmdSaveProfile.Visible(True)
+Gui.F_Maintenance.cmdSaveProfile.Zorder(0)
+Gui.F_Maintenance.cmdSaveProfile.FontName("Tahoma")
+Gui.F_Maintenance.cmdSaveProfile.FontSize(8.25)
+Gui.F_Maintenance.cmdClearScreen.Create(Button)
+Gui.F_Maintenance.cmdClearScreen.Size(1230,345)
+Gui.F_Maintenance.cmdClearScreen.Position(135,10665)
+Gui.F_Maintenance.cmdClearScreen.Caption("Clear Screen")
+Gui.F_Maintenance.cmdClearScreen.Event(Click,cmdClearScreen_Click)
+Gui.F_Maintenance.cmdClearScreen.Enabled(True)
+Gui.F_Maintenance.cmdClearScreen.Visible(True)
+Gui.F_Maintenance.cmdClearScreen.Zorder(0)
+Gui.F_Maintenance.cmdClearScreen.FontName("Tahoma")
+Gui.F_Maintenance.cmdClearScreen.FontSize(8.25)
+Gui.F_Maintenance.cmdDebug.Create(Button)
+Gui.F_Maintenance.cmdDebug.Enabled(True)
+Gui.F_Maintenance.cmdDebug.Visible(True)
+Gui.F_Maintenance.cmdDebug.Zorder(0)
+Gui.F_Maintenance.cmdDebug.Size(1125,345)
+Gui.F_Maintenance.cmdDebug.Position(11850,330)
+Gui.F_Maintenance.cmdDebug.Caption("Debugger")
+Gui.F_Maintenance.cmdDebug.FontName("Tahoma")
+Gui.F_Maintenance.cmdDebug.FontSize(8.25)
+Gui.F_Maintenance.cmdDebug.Event(Click,cmdDebug_Click)
+Gui.F_Selection..Create(BaseForm)
+Gui.F_Selection..Caption("Selection Screen")
+Gui.F_Selection..Size(6150,7830)
+Gui.F_Selection..MinX(0)
+Gui.F_Selection..MinY(0)
+Gui.F_Selection..Position(0,0)
+Gui.F_Selection..BackColor(-2147483633)
+Gui.F_Selection..MaxButton(False)
+Gui.F_Selection..MinButton(False)
+Gui.F_Selection..MousePointer(0)
+Gui.F_Selection..Event(UnLoad,F_Selection_UnLoad)
+Gui.F_Selection..Sizeable(False)
+Gui.F_Selection..AlwaysOnTop(False)
+Gui.F_Selection..FontName("Tahoma")
+Gui.F_Selection..FontSize(8.25)
+Gui.F_Selection..ControlBox(True)
+Gui.F_Selection..Moveable(True)
+Gui.F_Selection..ShowInTaskBar(True)
+Gui.F_Selection..TitleBar(True)
+Gui.F_Selection.lblTypeLine.Create(Label,"Label",True,1935,255,0,105,135,True,0,"Arial",8,-2147483633,0,0)
+Gui.F_Selection.lblTypeLine.BorderStyle(0)
+Gui.F_Selection.GsGcSelection.Create(GsGridControl)
+Gui.F_Selection.GsGcSelection.Size(5775,6330)
+Gui.F_Selection.GsGcSelection.Position(75,405)
+Gui.F_Selection.GsGcSelection.Anchor(15)
+Gui.F_Selection.GsGcSelection.Enabled(True)
+Gui.F_Selection.GsGcSelection.Visible(True)
+Gui.F_Selection.GsGcSelection.Zorder(0)
+Gui.F_Selection.cmdSelect.Create(Button)
+Gui.F_Selection.cmdSelect.Size(855,375)
+Gui.F_Selection.cmdSelect.Position(4980,6795)
+Gui.F_Selection.cmdSelect.Caption("Select")
+Gui.F_Selection.cmdSelect.Event(Click,cmdSelect_Click)
+Gui.F_Selection.cmdSelect.Anchor(10)
+Gui.F_Selection.cmdSelect.Enabled(True)
+Gui.F_Selection.cmdSelect.Visible(True)
+Gui.F_Selection.cmdSelect.Zorder(0)
+Gui.F_Selection.cmdSelect.FontName("Tahoma")
+Gui.F_Selection.cmdSelect.FontSize(8.25)
+Gui.F_Selection.cmdCancel.Create(Button)
+Gui.F_Selection.cmdCancel.Size(855,375)
+Gui.F_Selection.cmdCancel.Position(4080,6795)
+Gui.F_Selection.cmdCancel.Caption("Cancel")
+Gui.F_Selection.cmdCancel.Event(Click,cmdCancel_Click)
+Gui.F_Selection.cmdCancel.Anchor(10)
+Gui.F_Selection.cmdCancel.Enabled(True)
+Gui.F_Selection.cmdCancel.Visible(True)
+Gui.F_Selection.cmdCancel.Zorder(0)
+Gui.F_Selection.cmdCancel.FontName("Tahoma")
+Gui.F_Selection.cmdCancel.FontSize(8.25)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+v.Global.sRecordA.Declare
+v.Global.sRecordB.Declare
+v.Global.sRecordC.Declare
+v.Global.sRecordN.Declare
+v.Global.sRecord1.Declare
+v.Global.sRecord2.Declare
+v.Global.sRecordM.Declare
+v.Global.sSelectionScreen.Declare
+v.Global.sPassedDT.Declare
+v.Global.sPassedDV.Declare
+v.Global.sPassedNewDT.Declare
+v.Global.sPassedNewDV.Declare
+v.Global.sPassedNewGV.Declare
+v.Global.sPassedSelectedDV.Declare
+v.Global.sDateFormat.Declare
+v.Global.bLoadedFromDB.Declare(boolean,False)
+
+Program.Sub.Preflight.End
+
+'Author: Alejandro Anazco Villarreal, Daniel Duncan
+'Customer: Global Shop
+'Program Name: EDI Standard - Profile Maintenance
+'Date Started: 02/26/2019
+'Description: Script part of the EDI Standard Feature, this script will handle the maintenance of profiles for different customers.
+Program.Sub.Main.Start
+	f.Intrinsic.Control.Try
+		v.Local.bLicense.Declare
+		v.Local.bDate.Declare(boolean)
+		v.Local.sLeftChar.Declare
+
+		f.Global.General.ISLICENSEDBYMODULENAME("EDI", v.Local.bLicense)
+		f.Intrinsic.Control.If(v.Local.bLicense, =, false)
+			f.Intrinsic.UI.Msgbox("No EDI License found. Please contact your Account Rep.")
+			f.Intrinsic.Control.End
+		f.Intrinsic.Control.EndIf
+		
+		f.Intrinsic.Control.If(v.Caller.User.UCase, =, "SUPERVSR")
+			gui.F_Maintenance.cmdDebug.Visible(True)
+			gui.F_Maintenance.cmdDebug.Enabled(True)
+		f.Intrinsic.Control.Else
+			gui.F_Maintenance.cmdDebug.Visible(false)
+			gui.F_Maintenance.cmdDebug.Enabled(false)
+		f.Intrinsic.Control.EndIf
+		
+		f.Intrinsic.Control.CallSub(MoveCustomFiles)
+		f.Intrinsic.Control.CallSub(readFieldTitleData)
+		f.Intrinsic.Control.CallSub(checkProfiles)
+		
+		gui.F_Maintenance.optDateFormat1.Value(1)
+		v.Global.sDateFormat.Set("1")
+		f.Intrinsic.Control.CallSub(loadFormats)
+		gui.F_Maintenance..Show
+
+'		f.Intrinsic.String.Left("Jun-19",1,v.Local.sLeftChar)
+'		f.Intrinsic.Math.IsNumeric(v.Local.sLeftChar,v.Local.bDate)
+'		'f.Intrinsic.Date.IsDate("Jun-19",v.Local.bDate)
+'		f.Intrinsic.UI.Msgbox(v.Local.bDate)
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+'-------FORM EVENTS---------
+Program.Sub.chkHeaderLineA_Click.Start
+f.Intrinsic.Control.Try
+	'sets filter criteria depending on the checkbox
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkHeaderLineA.Value, =, 1)
+		v.Global.sRecordA.Set("or RecordType = 'A'")
+	f.Intrinsic.Control.Else
+		v.Global.sRecordA.Set("")
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.chkHeaderLineA_Click.End
+
+Program.Sub.chkHeaderLineB_Click.Start
+f.Intrinsic.Control.Try
+	'sets filter criteria depending on the checkbox
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkHeaderLineB.Value, =, 1)
+		v.Global.sRecordB.Set("or RecordType = 'B'")
+	f.Intrinsic.Control.Else
+		v.Global.sRecordB.Set("")
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.chkHeaderLineB_Click.End
+
+Program.Sub.chkHeaderLineC_Click.Start
+f.Intrinsic.Control.Try
+	'sets filter criteria depending on the checkbox
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkHeaderLineC.Value, =, 1)
+		v.Global.sRecordC.Set("or RecordType = 'C'")
+	f.Intrinsic.Control.Else
+		v.Global.sRecordC.Set("")
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.chkHeaderLineC_Click.End
+
+Program.Sub.chkHeaderLineN_Click.Start
+f.Intrinsic.Control.Try
+	'sets filter criteria depending on the checkbox
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkHeaderLineN.Value, =, 1)
+		v.Global.sRecordN.Set("or RecordType = 'N'")
+	f.Intrinsic.Control.Else
+		v.Global.sRecordN.Set("")
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.chkHeaderLineN_Click.End
+
+Program.Sub.chkLine2_Click.Start
+f.Intrinsic.Control.Try
+	'sets filter criteria depending on the checkbox
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkLine2.Value, =, 1)
+		v.Global.sRecord2.Set("or RecordType = '2'")
+	f.Intrinsic.Control.Else
+		v.Global.sRecord2.Set("")
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.chkLine2_Click.End
+
+Program.Sub.chkLineN_Click.Start
+f.Intrinsic.Control.Try
+	'sets filter criteria depending on the checkbox
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkLineN.Value, =, 1)
+		v.Global.sRecordN.Set("or RecordType = 'N'")
+	f.Intrinsic.Control.Else
+		v.Global.sRecordN.Set("")
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.chkLineN_Click.End
+
+Program.Sub.chkShipSchedM_Click.Start
+f.Intrinsic.Control.Try
+	'sets filter criteria depending on the checkbox. Also sets the check box for Ship Schedule
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkShipSchedM.Value, =, 1)
+		'v.Global.sRecordM.Set("or RecordType = 'M'")
+		v.Global.sRecordM.Set("RecordType = 'M'")
+		'gui.F_Maintenance.chkShipSchedM.Value(1)
+		gui.F_Maintenance.cmdShipSchedSelectFields.Enabled(true)
+	f.Intrinsic.Control.Else
+		v.Global.sRecordM.Set("")
+		'gui.F_Maintenance.chkShipSchedM.Value(0)
+		gui.F_Maintenance.cmdShipSchedSelectFields.Enabled(false)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.chkShipSchedM_Click.End
+
+Program.Sub.cmdHeaderSelectFields_Click.Start
+'Opens the Selection screen using the Header Information.
+v.Local.bExists.Declare(boolean)
+v.Local.sFilter.Declare
+f.Intrinsic.Control.Try
+	'checks if the a connection is in use.
+	f.Intrinsic.Control.If(v.ODBC!con.State, =, 1)
+		f.ODBC.Connection!con.Close
+	f.Intrinsic.Control.EndIf	
+	
+	'checks if the filteredDT use in the selection screen is open.
+	f.Intrinsic.Control.If(v.DataTable.filteredDT.Exists, =, True)
+		f.Intrinsic.Control.If(v.DataView.filteredDT!filteredDV.Exists, =, true)
+			f.Data.DataView.Close("filteredDT", "filteredDV")
+		f.Intrinsic.Control.EndIf
+		f.Data.DataTable.Close("filteredDT")
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.HeaderDT.Exists, =, true)
+	
+		f.Intrinsic.Control.If(v.DataView.HeaderDT!HeaderDV.Exists, =, true)
+			f.Data.DataTable.acceptchanges("headerDT")
+			f.Data.Dictionary.createfromdataview("dictHeader","headerDT","headerDV","FieldTitle","Required")
+			f.Data.Dictionary.SetDefaultReturn("dictHeader",False)
+		f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.EndIf
+	
+	
+	'creates a datatable with only the Header Fields.
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("selectionH_DT", "con", "Select rtrim(Fieldtitle) as FieldTitle, RecordType, required, FieldTitleID, VisibleID, FieldType, '' as SourceFieldType from GCG_5523_FIELDS_INFO where Header = '1' and VisibleID = '1' order by FieldtitleID asc", true)
+	f.ODBC.Connection!con.Close
+	
+	'filters the header datatable to the record types selected in the checkboxes.
+	f.Intrinsic.String.Build("RecordType = 'X' or RecordType = 'H'  {0} {1} {2} {3} and VisibleID = '1'", v.Global.sRecordA, v.Global.sRecordB, v.Global.sRecordC, v.Global.sRecordN, v.Local.sFilter)
+	f.Data.DataView.Create("selectionH_DT", "selectionH_DV", 22, v.Local.sFilter, "")
+	'creates a datatable from the filtered dataview. Closes the data structures used.
+	f.Data.DataView.ToDataTable("selectionH_DT", "selectionH_DV", "filteredDT", true)
+	f.Data.Dictionary.Exists("dictHeader",v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists)
+		f.Data.DataTable.FillFromDictionary("filteredDT","dictHeader","FieldTitle","Required")
+		f.Data.Dictionary.Close("dictHeader")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataView.Close("selectionH_DT", "selectionH_DV")
+	f.Data.DataTable.Close("selectionH_DT")
+	'creates a dataview that will be filtered in the selection screen. Creates a Gridview for the selection screen
+	f.Data.DataView.Create("filteredDT", "filteredDV", 22)
+	gui.F_Selection.GsGcSelection.AddGridviewFromDataview("selectionH_GV", "filteredDT", "filteredDV")
+	gui.F_Selection.GsGcSelection.MainView("selectionH_GV")
+	'sets the variables for header's data table match titles 
+	v.Global.sSelectionScreen.Set("GsGcHeaderFields")
+'	v.Global.sPassedDT.Set("filteredDT")
+'	v.Global.sPassedDV.Set("filteredDV")
+	v.Global.sPassedSelectedDV.Set("selectedH_DV")
+	v.Global.sPassedNewDT.Set("headerDT")
+	v.Global.sPassedNewDV.Set("headerDV")
+	v.Global.sPassedNewGV.Set("headerGV")
+	'calls properties for grid view and shows selection screen
+	f.Intrinsic.Control.CallSub(selectionGridProperties, GvName, "selectionH_GV")
+	gui.F_Selection..Show
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdHeaderSelectFields_Click.End
+
+Program.Sub.cmdLineSelectFields_Click.Start
+'Opens the Selection screen using the Line Information.
+v.Local.sFilter.Declare
+v.Local.bExists.Declare(boolean)
+f.Intrinsic.Control.Try
+	'checks if the a connection is in use.
+	f.Intrinsic.Control.If(v.ODBC!con.State, =, 1)
+		f.ODBC.Connection!con.Close
+	f.Intrinsic.Control.EndIf
+	
+	'checks if the filteredDT use in the selection screen is open.
+	f.Intrinsic.Control.If(v.DataTable.filteredDT.Exists, =, True)
+		f.Intrinsic.Control.If(v.DataView.filteredDT!filteredDV.Exists, =, true)
+			f.Data.DataView.Close("filteredDT", "filteredDV")
+		f.Intrinsic.Control.EndIf
+		f.Data.DataTable.Close("filteredDT")
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.LineDT.Exists, =, true)	
+		f.Intrinsic.Control.If(v.DataView.LineDT!LineDV.Exists, =, true)			
+			f.Data.DataTable.acceptchanges("LineDT")
+			f.Data.Dictionary.createfromdataview("dictLine","LineDT","LineDV","FieldTitle","Required")
+			f.Data.Dictionary.SetDefaultReturn("dictLine",False)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	'creates a datatable with only the Line Fields.
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("selectionL_DT", "con", "Select rtrim(Fieldtitle) as FieldTitle, RecordType, required, FieldTitleID, VisibleID,FieldType,'' as SourceFieldType from GCG_5523_FIELDS_INFO where Line = '1'  and VisibleID = '1' order by FieldtitleID asc", true)
+	f.ODBC.Connection!con.Close
+	
+	'filters the line datatable to the record types selected in the checkboxes.
+	f.Intrinsic.String.Build("RecordType = '1' {0} {1} and VisibleID = '1'", v.Global.sRecord2, v.Global.sRecordN, v.Local.sFilter)
+	f.Data.DataView.Create("selectionL_DT", "selectionL_DV", 22, v.Local.sFilter, "")
+	'creates a datatable from the filtered dataview. Closes the data structures used.
+	f.Data.DataView.ToDataTable("selectionL_DT", "selectionL_DV", "filteredDT", true)
+	f.Data.Dictionary.Exists("dictLine",v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists)
+		f.Data.DataTable.FillFromDictionary("filteredDT","dictLine","FieldTitle","Required")
+		f.Data.Dictionary.Close("dictLine")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataView.Close("selectionL_DT", "selectionL_DV")
+	f.Data.DataTable.Close("selectionL_DT")
+	'creates a dataview that will be filtered in the selection screen. Creates a Gridview for the selection screen
+	f.Data.DataView.Create("filteredDT", "filteredDV", 22)
+	gui.F_Selection.GsGcSelection.AddGridviewFromDataview("selectionL_GV", "filteredDT", "filteredDV")
+	gui.F_Selection.GsGcSelection.MainView("selectionL_GV")
+	'sets the variables for header's data table match Line 
+	v.Global.sSelectionScreen.Set("GsGcLineFields")
+	v.Global.sPassedSelectedDV.Set("selectedL_DV")
+	v.Global.sPassedNewDT.Set("LineDT")
+	v.Global.sPassedNewDV.Set("LineDV")
+	v.Global.sPassedNewGV.Set("LineGV")
+	'calls properties for grid view and shows selection screen
+	f.Intrinsic.Control.CallSub(selectionGridProperties, GvName, "selectionL_GV")
+	gui.F_Selection..Show
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdLineSelectFields_Click.End
+
+Program.Sub.cmdShipSchedSelectFields_Click.Start
+'Opens the Selection screen using the ShipSched Information.
+v.Local.sFilter.Declare
+v.Local.bExists.Declare(boolean)
+f.Intrinsic.Control.Try
+	'Checks if the Schip Sched is selected.
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkShipSchedM.Value, =, 0)
+		f.Intrinsic.Control.ExitSub
+	f.Intrinsic.Control.EndIf
+	
+	'checks if the a connection is in use.
+	f.Intrinsic.Control.If(v.ODBC!con.State, =, 1)
+		f.ODBC.Connection!con.Close
+	f.Intrinsic.Control.EndIf
+	
+	'checks if the filteredDT use in the selection screen is open.
+	f.Intrinsic.Control.If(v.DataTable.filteredDT.Exists, =, True)
+		f.Intrinsic.Control.If(v.DataView.filteredDT!filteredDV.Exists, =, true)
+			f.Data.DataView.Close("filteredDT", "filteredDV")
+		f.Intrinsic.Control.EndIf
+		f.Data.DataTable.Close("filteredDT")
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.shipDT.Exists, =, true)	
+		f.Intrinsic.Control.If(v.DataView.shipDT!shipDV.Exists, =, true)
+			f.Data.Dictionary.createfromdataview("dictShip","shipDT","shipDV","FieldTitle","Required")
+			f.Data.Dictionary.SetDefaultReturn("dictShip",False)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	
+	'creates a datatable with only the Schip Sched Fields.
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("selectionM_DT", "con", "Select rtrim(Fieldtitle) as FieldTitle, RecordType, required , FieldTitleID, VisibleID,FieldType,'' as SourceFieldType from GCG_5523_FIELDS_INFO where Ship = '1' and VisibleID = '1' order by FieldtitleID asc", true)
+	f.ODBC.Connection!con.Close
+	
+	'filters the line datatable to the record types selected in the checkboxes.
+	f.Intrinsic.String.Build("{0} and VisibleID = '1'", v.Global.sRecordM, v.Local.sFilter)
+	'f.Intrinsic.String.Build("RecordType = 'X' or {0} and VisibleID = '1'", v.Global.sRecordM, v.Local.sFilter)
+	'f.Intrinsic.String.Build("RecordType = 'X' {0}", v.Global.sRecordM, v.Local.sFilter)
+	'f.Intrinsic.String.Build("{0}", v.Global.sRecordM, v.Local.sFilter)
+	f.Data.DataView.Create("selectionM_DT", "selectionM_DV", 22, v.Local.sFilter, "")
+	'creates a datatable from the filtered dataview. Closes the data structures used.
+	f.Data.DataView.ToDataTable("selectionM_DT", "selectionM_DV", "filteredDT", true)
+	f.Data.Dictionary.Exists("dictShip",v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists)
+		f.Data.DataTable.FillFromDictionary("filteredDT","dictShip","FieldTitle","Required")
+		f.Data.Dictionary.Close("dictShip")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataView.Close("selectionM_DT", "selectionM_DV")
+	f.Data.DataTable.Close("selectionM_DT")
+	'creates a dataview that will be filtered in the selection screen. Creates a Gridview for the selection screen
+	f.Data.DataView.Create("filteredDT", "filteredDV", 22)
+	gui.F_Selection.GsGcSelection.AddGridviewFromDataview("selectionM_GV", "filteredDT", "filteredDV")
+	gui.F_Selection.GsGcSelection.MainView("selectionM_GV")
+	'sets the variables for header's data table match Schip Sched 
+	v.Global.sSelectionScreen.Set("GsGcShipSchedSelectFields")
+'	v.Global.sPassedDT.Set("filteredDT")
+'	v.Global.sPassedDV.Set("filteredDV")
+	v.Global.sPassedSelectedDV.Set("selectedM_DV")
+	v.Global.sPassedNewDT.Set("shipDT")
+	v.Global.sPassedNewDV.Set("shipDV")
+	v.Global.sPassedNewGV.Set("shipGV")
+	'calls properties for grid view and shows selection screen
+	f.Intrinsic.Control.CallSub(selectionGridProperties, GvName, "selectionM_GV")
+	gui.F_Selection..Show
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdShipSchedSelectFields_Click.End
+
+Program.Sub.cmdSelect_Click.Start
+v.Local.sDropdownList.Declare
+v.Local.bFillFromDict.Declare(boolean)
+v.Local.iRet.Declare(long)
+f.Intrinsic.Control.Try
+	'Save the grid configurations
+	'F.Intrinsic.Control.CallSub(Serialize)
+	'Creates a dataview of all the selected fields.
+	f.Data.DataTable.acceptchanges("filteredDT")
+	f.Data.DataView.Create("filteredDT", v.Global.sPassedSelectedDV, 22, "required", "")
+	'Creates a new Data table from the dataview of selected fields. Adds new needed Columns to Match Fields to titles.
+
+	f.Intrinsic.Control.If(v.DataTable.[v.Global.sPassedNewDT].Exists, =, True)
+		f.Intrinsic.Control.If(v.DataView.[v.Global.sPassedNewDT]![v.Global.sPassedNewDV].Exists, =, true)
+			'Save the mapped columns and values to be filled back in after new options are checked and added back to the displayed grid
+			f.Data.Dictionary.createfromdataview("dictMappedCols",v.Global.sPassedNewDT,v.Global.sPassedNewDV,"FieldTitle","TitleNumber")
+			f.Data.Dictionary.SetDefaultReturn("dictMappedCols","")
+			f.Data.Dictionary.createfromdataview("dictMappedVals",v.Global.sPassedNewDT,v.Global.sPassedNewDV,"FieldTitle","TitleName")
+			f.Data.Dictionary.SetDefaultReturn("dictMappedVals","")
+			v.Local.bFillFromDict.Set(True)
+			f.Data.DataView.Close(v.Global.sPassedNewDT, v.Global.sPassedNewDV)
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	
+	
+	f.Intrinsic.Control.If(v.DataTable.[v.Global.sPassedNewDT].Exists, =, true)
+		f.Data.DataTable.Close(v.Global.sPassedNewDT)
+	f.Intrinsic.Control.EndIf
+	f.Data.DataView.ToDataTable("filteredDT", v.Global.sPassedSelectedDV, v.Global.sPassedNewDT, true)
+	f.Data.DataTable.AddColumn(v.Global.sPassedNewDT, "titleNumber", "String")
+	f.Data.DataTable.AddColumn(v.Global.sPassedNewDT, "titleName", "String")
+	'Fill values for these columns
+	f.Intrinsic.Control.If(v.Local.bFillFromDict)
+		f.Data.DataTable.FillFromDictionary(v.Global.sPassedNewDT,"dictMappedCols","FieldTitle","TitleNumber")
+		f.Data.DataTable.FillFromDictionary(v.Global.sPassedNewDT,"dictMappedVals","FieldTitle","TitleName")
+		f.Data.Dictionary.Close("dictMappedCols")
+		f.Data.Dictionary.Close("dictMappedVals")
+	f.Intrinsic.Control.EndIf
+	'Creates dataview for Grid. Closes used DTs and DVs.
+	f.Data.DataView.Create(v.Global.sPassedNewDT, v.Global.sPassedNewDV, 22)
+	f.Data.DataView.Close("filteredDT", v.Global.sPassedSelectedDV)
+	f.Data.DataView.Close("filteredDT", "filteredDV")
+	f.Data.DataTable.Close("filteredDT")
+	'Creates Gridview, calls for Properties
+	gui.F_Maintenance.[v.Global.sSelectionScreen].AddGridviewFromDataview(v.Global.sPassedNewGV, v.Global.sPassedNewDT, v.Global.sPassedNewDV)
+	f.Intrinsic.Control.CallSub(gridPropertiestitleMatch, passedDT, v.Global.sPassedNewDT, passedGsGC, v.Global.sSelectionScreen, passedGV, v.Global.sPassedNewGV)
+	'If ship schedule has been added, add the L-MULT-QTY title to the Lines grid
+	
+	f.Intrinsic.Control.If(v.Global.sPassedNewDT,=,"shipDT","AND",v.DataTable.[v.Global.sPassedNewDT].RowCount,>,0)
+		'Check if the title has already been added.  If so, make sure it is checked.  If not, add it as checked.
+		f.Data.DataTable.Compute("LineDT","COUNT(FieldTitle)","FieldTitle='L-MULT-QTY'",v.Local.iRet)
+		f.Intrinsic.Control.If(v.Local.iRet,=,0)
+			f.Data.DataTable.AddRow("LineDT","FieldTitle","L-MULT-QTY","RecordType","1","Required",True,"FieldTitleID",99,"VisibleID",1,"FieldType","C","SourceFieldType","Line                                              ")
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	'Creates DropdownList with a blank space first and then all the Field titles. Sets Mainview in the Gridview, Makes it vissible and closes selection screen.
+	f.Intrinsic.String.Build(" *!*{0}", v.DataTable.fieldtitlesDT.FieldNames, v.Local.sDropdownList)
+	gui.F_Maintenance.[v.Global.sSelectionScreen].ColumnEdit(v.Global.sPassedNewGV,"titleNumber", "Dropdownlist", v.Local.sDropdownList)	
+	gui.F_Maintenance.[v.Global.sSelectionScreen].MainView(v.Global.sPassedNewGV)
+	gui.F_Maintenance.[v.Global.sSelectionScreen].Visible(True)
+	gui.F_Selection..Visible(0)
+	'F.Intrinsic.Control.CallSub(Deserialize)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdSelect_Click.End
+
+Program.Sub.F_Selection_UnLoad.Start
+f.Intrinsic.Control.Try
+	'Checks if DTs, DVs are open and closses them.
+	f.Intrinsic.Control.If(v.DataTable.filteredDT.Exists, =, true)
+		f.Intrinsic.Control.If(v.DataView.filteredDT!filteredDV.Exists, =, true)
+			f.Data.DataView.Close("filteredDT", "filteredDV")
+		f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.If(v.DataView.fieldtitlesDT![v.Global.sPassedSelectedDV].Exists, =, true)
+			f.Data.DataView.Close("filteredDT", v.Global.sPassedSelectedDV)
+		f.Intrinsic.Control.EndIf	
+		f.Data.DataTable.Close("filteredDT")
+	f.Intrinsic.Control.EndIf
+	'closes the screen
+	gui.F_Selection..Visible(0)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.F_Selection_UnLoad.End
+
+Program.Sub.cmdCancel_Click.Start
+f.Intrinsic.Control.Try
+'	'Checks if DTs, DVs are open and closses them.
+'	f.Intrinsic.Control.If(v.DataView.filteredDT!filteredDV.Exists, =, true)
+'		f.Data.DataView.Close("filteredDT", "filteredDV")
+'	f.Intrinsic.Control.EndIf
+'	f.Intrinsic.Control.If(v.DataView.fieldtitlesDT![v.Global.sPassedSelectedDV].Exists, =, true)
+'		f.Data.DataView.Close("filteredDT", v.Global.sPassedSelectedDV)
+'	f.Intrinsic.Control.EndIf
+'	f.Intrinsic.Control.If(v.DataTable.filteredDT.Exists, =, true)
+'		f.Data.DataTable.Close("filteredDT")
+'	f.Intrinsic.Control.EndIf
+'	'closes the screen
+'	gui.F_Selection..Visible(0)
+	f.Intrinsic.Control.CallSub(F_Selection_UnLoad)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdCancel_Click.End
+
+Program.Sub.cmdBrwFieldtitles_Click.Start
+v.Local.sRet.Declare
+'Gets the location of the CSV titles.
+f.Intrinsic.UI.ShowOpenFileDialog("", "", "", v.Local.sRet)
+f.Intrinsic.Control.If(V.local.sRet,=,"***CANCEL***")
+	f.Intrinsic.UI.Msgbox("Please choose a File")
+	f.Intrinsic.Control.ExitSub
+f.Intrinsic.Control.Else
+	gui.F_Maintenance.txttitlesFileLocation.Text(v.Local.sRet)
+f.Intrinsic.Control.EndIf
+Program.Sub.cmdBrwFieldtitles_Click.End
+
+Program.Sub.cmdFieldtitlesUpload_Click.Start
+v.Local.sRet.Declare
+v.Local.sTemp.Declare
+v.Local.sTemp1.Declare
+v.Local.sTemp2.Declare
+v.Local.sFieldtitles.Declare
+v.Local.sFieldTypes.Declare
+v.Local.iCnt.Declare
+v.Local.sSecondLine.Declare
+v.Local.sSecondLineSplit.Declare
+v.Local.bExists.Declare(boolean)
+f.Intrinsic.Control.Try
+	f.Intrinsic.File.Exists(v.Screen.F_Maintenance!txttitlesFileLocation.Text!FieldValTrim,v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists,=,False)
+		f.Intrinsic.UI.Msgbox("File does not exist.")
+		f.Intrinsic.Control.ExitSub
+	f.Intrinsic.Control.EndIf
+	
+	'Gets the first line from the CSV file. This File is just for titles.
+	f.Intrinsic.File.File2String(v.Screen.F_Maintenance!txttitlesFileLocation.Text!FieldValTrim, v.Local.sRet)
+	f.Intrinsic.String.Split(v.Local.sRet, v.Ambient.NewLine, v.Local.sTemp)
+	f.Intrinsic.Control.If(v.Local.sTemp.UBound, >, 0)
+		v.Local.sSecondLine.Set(v.Local.sTemp(1))
+		f.Intrinsic.String.SplitCSV(v.Local.sSecondLine, v.Local.sSecondLineSplit)
+		
+		'f.Intrinsic.String.Split(v.Local.sSecondLine, ",", v.Local.sSecondLineSplit)
+		f.Intrinsic.String.Join(v.Local.sSecondLineSplit, "*!*", v.Local.sSecondLine)
+	f.Intrinsic.Control.EndIf	
+	
+	v.Local.sTemp.RedimPreserve(0, 0)
+	 
+	'Splits the title line into an array for looping. Creates matching arrays for ColumnTypes and ColumnNames
+	f.Intrinsic.String.Split(v.Local.sTemp, ",", v.Local.sRet)
+	v.Local.sRet.RedimPreserve(0, v.Local.sRet.UBound)
+	v.Local.sTemp1.RedimPreserve(0, v.Local.sRet.UBound)
+	v.Local.sTemp2.RedimPreserve(0, v.Local.sRet.UBound)
+	'Dictionary to match a column title to title name.
+	f.Data.Dictionary.Exists("fieldtitleDictionary", v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists)
+		f.Data.Dictionary.Close("fieldtitleDictionary")
+	f.Intrinsic.Control.EndIf
+	f.Data.Dictionary.Create("fieldtitleDictionary")
+	
+	'loops though title's array, sets values ColumnTypes and ColumnNames temp Arrays. Adds an item to the dictionary matching a columntitle to a columnName.
+	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.sRet.UBound, 1)
+		v.Local.sTemp1(v.Local.iCnt).Set("String")
+		v.Local.sTemp2(v.Local.iCnt).Set(v.Local.iCnt)
+		f.Data.Dictionary.AddItem("fieldtitleDictionary", v.Local.sTemp2(v.Local.iCnt), v.Local.sRet(v.Local.iCnt))
+	f.Intrinsic.Control.Next(v.Local.iCnt)
+	
+	'transforming the arrays into strings. sTemp = Data table DATA.
+	f.Intrinsic.String.Join(v.Local.sTemp1, "*!*", v.Local.sFieldTypes)
+	f.Intrinsic.String.Join(v.Local.sTemp2, "*!*", v.Local.sFieldtitles)
+	f.Intrinsic.String.Join(v.Local.sRet, "*!*", v.Local.sTemp)
+	f.Intrinsic.String.Build("{0}$!${1}",  v.Local.sTemp, v.Local.sSecondLine, v.Local.sTemp)
+	
+	'creates datatable for the Column Header, matching a numbered title to name. Creates and Formart Gridview.
+	f.Intrinsic.Control.If(v.DataTable.fieldtitlesDT.Exists)
+		f.Data.DataTable.Close("fieldtitlesDT")
+	f.Intrinsic.Control.EndIf
+	
+	f.Data.DataTable.CreateFromString("fieldtitlesDT", v.Local.sTemp, v.Local.sFieldtitles, v.Local.sFieldTypes, "*!*", "$!$",true)
+	
+	gui.F_Maintenance.GsGcFieldtitles.AddGridviewFromDatatable("fieldtitlesGV", "fieldtitlesDT")	
+	f.Intrinsic.Control.CallSub(gridPropertiesFieldtitles)
+	gui.F_Maintenance.GsGcFieldtitles.MainView("fieldtitlesGV")
+	'Shows Gridview and enables Header, Line and Ship frames.
+	gui.F_Maintenance.GsGcFieldtitles.Visible(True)
+	gui.F_Maintenance.frmHeader.Enabled(True)
+	gui.F_Maintenance.frmLine.Enabled(True)
+	gui.F_Maintenance.frmShipSchedule.Enabled(True)
+	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdFieldtitlesUpload_Click.End
+
+Program.Sub.GsGcHeaderFields_CellValueChanged.Start
+f.Intrinsic.Control.Try
+	f.Intrinsic.Control.SelectCase(v.Args.Column)
+	'If an item is selected from dropdownList it copies the value into the NameColumn and then fills from dictionary NameColumn
+	f.Intrinsic.Control.Case("TITLENUMBER")
+		f.Data.DataView.SetValue("headerDT", "headerDV", v.Args.RowIndex, "titleName", v.DataView.headerDT!headerDV(v.Args.RowIndex).titleNumber!FieldValTrim)
+		f.Data.DataTable.FillFromDictionary("headerDT", "fieldtitleDictionary", "titleName")	
+		gui.F_Maintenance.GsGcHeaderFields.BestFitColumns("headerGV")
+	f.Intrinsic.Control.EndSelect
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.GsGcHeaderFields_CellValueChanged.End
+
+Program.Sub.GsGcLineFields_CellValueChanged.Start
+f.Intrinsic.Control.Try
+	f.Intrinsic.Control.SelectCase(v.Args.Column)
+	'If an item is selected from dropdownList it copies the value into the NameColumn and then fills from dictionary NameColumn
+	f.Intrinsic.Control.Case("TITLENUMBER")
+		f.Data.DataView.SetValue("LineDT", "LineDV", v.Args.RowIndex, "titleName", v.DataView.LineDT!LineDV(v.Args.RowIndex).titleNumber!FieldValTrim)
+		f.Data.DataTable.FillFromDictionary("LineDT", "fieldtitleDictionary", "titleName")		
+		gui.F_Maintenance.GsGcLineFields.BestFitColumns("LineGV")
+	f.Intrinsic.Control.EndSelect
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.GsGcLineFields_CellValueChanged.End
+
+Program.Sub.GsGcShipSchedSelectFields_CellValueChanged.Start
+f.Intrinsic.Control.Try
+	f.Intrinsic.Control.SelectCase(v.Args.Column)
+	'If an item is selected from dropdownList it copies the value into the NameColumn and then fills from dictionary NameColumn
+	f.Intrinsic.Control.Case("TITLENUMBER")
+		f.Data.DataView.SetValue("shipDT", "shipDV", v.Args.RowIndex, "titleName", v.DataView.shipDT!shipDV(v.Args.RowIndex).titleNumber!FieldValTrim)
+		f.Data.DataTable.FillFromDictionary("shipDT", "fieldtitleDictionary", "titleName")	
+		gui.F_Maintenance.GsGcShipSchedSelectFields.BstFitColumns("shipGV")
+	f.Intrinsic.Control.EndSelect
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.GsGcShipSchedSelectFields_CellValueChanged.End
+
+Program.Sub.F_Maintenance_UnLoad.Start
+'Can only serialize when the datatables (and therefore the gridviews) exist
+f.Intrinsic.Control.Try
+	f.Intrinsic.Control.If(v.DataTable.headerDT.Exists)
+	f.Intrinsic.Control.andIf(v.DataTable.lineDT.exists)
+	f.Intrinsic.Control.andIf(v.DataTable.shipDT.Exists)
+	f.Intrinsic.Control.andIf(v.DataTable.fieldtitlesDT.Exists)
+		'f.Intrinsic.Control.CallSub(Serialize)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+f.Intrinsic.Control.End
+Program.Sub.F_Maintenance_UnLoad.End
+
+Program.Sub.optDateFormat1_Click.Start
+f.Intrinsic.Control.If(v.Screen.F_Maintenance!optDateFormat1.Value)
+	v.Global.sDateFormat.Set("1")
+f.Intrinsic.Control.EndIf
+Program.Sub.optDateFormat1_Click.End
+
+Program.Sub.optDateFormat2_Click.Start
+f.Intrinsic.Control.If(v.Screen.F_Maintenance!optDateFormat2.Value)
+	v.Global.sDateFormat.Set("2")
+f.Intrinsic.Control.EndIf
+Program.Sub.optDateFormat2_Click.End
+
+Program.Sub.optDateFormat3_Click.Start
+f.Intrinsic.Control.If(v.Screen.F_Maintenance!optDateFormat3.Value)
+	v.Global.sDateFormat.Set("3")
+f.Intrinsic.Control.EndIf
+Program.Sub.optDateFormat3_Click.End
+
+Program.Sub.cmdBwrDefaultLocCSV_Click.Start
+v.Local.sRet.Declare
+'Gets the location of the CSV titles.
+f.Intrinsic.UI.FolderBrowser("", "", v.Local.sRet)
+f.Intrinsic.Control.If(V.local.sRet,=,"***CANCEL***")
+	f.Intrinsic.UI.Msgbox("Please choose a File")
+	f.Intrinsic.Control.ExitSub
+f.Intrinsic.Control.Else
+	gui.F_Maintenance.txtDefaultLocCSV.Text(v.Local.sRet)
+f.Intrinsic.Control.EndIf
+Program.Sub.cmdBwrDefaultLocCSV_Click.End
+
+Program.Sub.cmdBrwDefaultDestEDI_Click.Start
+v.Local.sRet.Declare
+'Gets the location of the CSV titles.
+f.Intrinsic.UI.FolderBrowser("", "", v.Local.sRet)
+f.Intrinsic.Control.If(V.local.sRet,=,"***CANCEL***")
+	f.Intrinsic.UI.Msgbox("Please choose a File")
+	f.Intrinsic.Control.ExitSub
+f.Intrinsic.Control.Else
+	gui.F_Maintenance.txtDefaultDestEDI.Text(v.Local.sRet)
+f.Intrinsic.Control.EndIf
+Program.Sub.cmdBrwDefaultDestEDI_Click.End
+
+Program.Sub.cmdClearScreen_Click.Start
+	'Reset the screen, close all datatables and dataviews and gridviews
+	f.Intrinsic.Control.Try
+		gui.F_Maintenance.txtDefaultDestEDI.Text("")
+		gui.F_Maintenance.txtDefaultLocCSV.Text("")
+		gui.F_Maintenance.txtProjectName.Text("")
+		gui.F_Maintenance.txttitlesFileLocation.Text("")
+		gui.F_Maintenance.cboProfile.Text("")
+		f.Intrinsic.Control.CallSub("closeDTs")
+		gui.F_Maintenance.chkAddDate.Value(0)
+		gui.F_Maintenance.chkAddProjectName.Value(0)
+		gui.F_Maintenance.chkAddTerminal.Value(0)
+		gui.F_Maintenance.chkAddTimeStamp.Value(0)
+		gui.F_Maintenance.chkAddUsername.Value(0)
+		f.Intrinsic.Control.callsub(changelNameLabel)
+		
+		gui.F_Maintenance.chk_H-BuyerID.Value(0)
+		gui.F_Maintenance.chk_H-DueDate.Value(0)
+		gui.F_Maintenance.chk_H-PO_Number.Value(0)
+		gui.F_Maintenance.chk_H-Ship-To.Value(0)
+		gui.F_Maintenance.chk_L-PartNum.Value(0)
+		gui.F_Maintenance.chk_L-PO-LineNbr.Value(0)
+		gui.F_Maintenance.chkRowTitles.Value(0)
+		
+		gui.F_Maintenance.chkHeaderLineA.Value(0)
+		gui.F_Maintenance.chkHeaderLineB.Value(0)
+		gui.F_Maintenance.chkHeaderLineC.Value(0)
+		gui.F_Maintenance.chkHeaderLineN.Value(0)
+		
+		gui.F_Maintenance.chkLine2.Value(0)
+		gui.F_Maintenance.chkLineN.Value(0)
+		
+		gui.F_Maintenance.chkShipSchedM.Value(0)
+		
+		GUI.F_Maintenance.frmHeader.Enabled(False)
+		GUI.F_Maintenance.frmLine.Enabled(False)
+		GUI.F_Maintenance.frmShipSchedule.Enabled(False)
+		
+		GUI.F_Maintenance.GsGcHeaderFields.ClearRows("headerGV")
+		GUI.F_Maintenance.GsGcLineFields.ClearRows("LineGV")
+		GUI.F_Maintenance.GsGcShipSchedSelectFields.ClearRows("shipGV")
+		GUI.F_Maintenance.GsGcFieldtitles.ClearRows("FieldTitlesGV")
+		
+		v.Global.sRecordA.Set("")
+		v.Global.sRecordB.Set("")
+		v.Global.sRecordC.Set("")
+		v.Global.sRecordN.Set("")
+		v.Global.sRecord2.Set("")
+		v.Global.sRecordM.Set("")
+		
+		gui.F_Maintenance.optDateFormat1.Value(1)
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.cmdClearScreen_Click.End
+
+Program.Sub.F_Maintenance_Resize.Start
+	f.Intrinsic.Control.Try	
+		v.Local.fRemainingSpace.Declare(float)
+		v.Local.fRemainingSpacePerc.Declare(float)
+		v.Local.fHLSFrameWidth.Declare(float)
+		v.Local.fHLSFrameXPos.Declare(float)
+		v.Local.fOptionFrameWidth.Declare(float)	
+		
+		'Subtract the static widths out of the screen width (120 at the left, 3960 for options frame, 60 between options and header frames, 90 between other frames (x2), and 360 remaining)
+		f.Intrinsic.Math.Sub(v.Screen.F_Maintenance.Width,4680,v.Local.fRemainingSpace)
+		'Subtract the spaces out of the screen height (120 at top, 45 between each frame (x3), and 600 remaining)
+		'f.Intrinsic.Math.Sub(v.Screen.F_Maintenance.Height,855,v.Local.fRemainingSpace)
+		
+		'Get the % of the remaining space to the original screen height
+		f.Intrinsic.Math.Div(v.Local.fRemainingSpace,v.Screen.F_Maintenance.width,v.Local.fRemainingSpacePerc)
+		
+		'Set the percentages of the frames.  The remaining 3 frames are each one third of the space.
+		f.Intrinsic.Math.Mult(v.Screen.F_Maintenance.width,v.Local.fRemainingSpacePerc,v.Local.fHLSFrameWidth)
+		f.Intrinsic.Math.Mult(v.Local.fHLSFrameWidth,0.33,v.Local.fHLSFrameWidth)
+		
+		'Set the size of the frames
+		gui.F_Maintenance.frmHeader.Size(v.Local.fHLSFrameWidth, v.Screen.F_Maintenance!frmHeader.Height)
+		gui.F_Maintenance.frmLine.Size(v.Local.fHLSFrameWidth,v.Screen.F_Maintenance!frmLine.Height)
+		gui.F_Maintenance.frmShipSchedule.Size(v.Local.fHLSFrameWidth, v.Screen.F_Maintenance!frmShipSchedule.Height)
+				
+		'Set the position of the lines frame.  Header starts at 4170, 90 in between header and line
+		f.Intrinsic.Math.Add(4170,v.Local.fHLSFrameWidth,v.Local.fHLSFrameXPos)
+		f.Intrinsic.Math.Add(v.Local.fHLSFrameXPos,90,v.Local.fHLSFrameXPos)
+		gui.F_Maintenance.frmLine.Position(v.Local.fHLSFrameXPos,2985)
+		
+		'Set the position of the ship schedule frame
+		f.Intrinsic.Math.Add(v.Local.fHLSFrameXPos,v.Local.fHLSFrameWidth,v.Local.fHLSFrameXPos)
+		f.Intrinsic.Math.Add(v.Local.fHLSFrameXPos,90,v.Local.fHLSFrameXPos)
+		gui.F_Maintenance.frmShipSchedule.Position(v.Local.fHLSFrameXPos,2985)
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.F_Maintenance_Resize.End
+
+Program.Sub.cmdOpen_Click.Start
+v.Local.sRet.Declare
+v.Local.sSQL.Declare
+v.Local.iRetIndex.Declare
+v.Local.iCnt.Declare(long,0)
+v.Local.sTemp.Declare
+v.Local.iRecordCount.Declare(long)
+v.local.iColCount.Declare(long,1)
+v.Local.sDropdownlist.Declare(string)
+v.Local.bExists.Declare(boolean)
+
+f.Intrinsic.Control.Try
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Intrinsic.UI.Browser("Profiles", "con", "Select distinct ProjectName from GCG_5523_EDI_OPTIONS", "Profile Name", 80, v.Local.sRet)
+	f.ODBC.Connection!con.Close	
+	f.Intrinsic.Control.If(v.Local.sRet, !=,"***CANCEL***")
+		f.Intrinsic.UI.InvokeWaitDialog("Loading profile...")
+		f.Intrinsic.UI.ChangeWaitStatus("Loading profile...", 0, 0, 100)
+		f.Intrinsic.Control.If(v.DataTable.loadProfileDT.Exists)
+			f.Data.DataTable.Close("loadProfileDT")
+		f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.If(v.DataTable.dtProfileFieldInfo.Exists)
+			f.Data.DataTable.Close("dtProfileFieldInfo")
+		f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.If(v.DataTable.headerDT.Exists)
+			f.Data.DataTable.Close("headerDT")
+		f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.If(v.DataTable.lineDT.Exists)
+			f.Data.DataTable.Close("lineDT")
+		f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.If(v.DataTable.shipDT.Exists)
+			f.Data.DataTable.Close("shipDT")
+		f.Intrinsic.Control.EndIf
+		f.ODBC.Connection!con.OpenCompanyConnection
+			f.Intrinsic.String.Build("Select Ltrim(Rtrim(FieldTitle)) as FieldTitle, ltrim(rtrim(replace(FieldValue,'#',''))) as FieldValue, FieldType, '' as TitleNumber, '' as TitleName from GCG_5523_EDI_OPTIONS where ProjectName = '{0}' order by OrderID", v.Local.sRet, v.Local.sSQL)
+			f.Data.DataTable.CreateFromSQL("loadProfileDT", "con", v.Local.sSQL, true)
+			f.Data.DataView.Create("loadProfileDT", "loadProfileDV", 22)
+			
+			f.Intrinsic.String.Build("Select top 1 * from GCG_5523_Pre_Proc where ProjectToUse = '{0}'", v.Local.sRet, v.Local.sSQL)
+			f.Data.Datatable.CreateFromSQL("preProcDT", "con", v.Local.sSQL)
+			
+			f.Intrinsic.Control.If(v.DataTable.preProcDT.RowCount, =, 1)
+				gui.F_Maintenance.chk1.Value(v.DataTable.preProcDT(0).UsePreProc!FieldVal)
+				gui.F_Maintenance.txtPreProcessor.Text(v.DataTable.preProcDT(0).PreProcLoc!FieldValTrim)
+			f.Intrinsic.Control.EndIf
+			
+			f.Data.Datatable.Close("preProcDT")
+		f.ODBC.Connection!con.Close
+		f.Intrinsic.UI.ChangeWaitStatus("Loading profile...", 25, 0, 100)
+		'Input Data
+		gui.F_Maintenance.txtProjectName.Text(v.DataTable.loadProfileDT(0).FieldValue!FieldValTrim)
+		gui.F_Maintenance.txtDefaultLocCSV.Text(v.DataTable.loadProfileDT(1).FieldValue!FieldValTrim)
+		gui.F_Maintenance.txtDefaultDestEDI.Text(v.DataTable.loadProfileDT(2).FieldValue!FieldValTrim)	
+		gui.F_Maintenance.cboProfile.FindItem(v.DataTable.loadProfileDT(3).FieldValue!FieldValTrim, true, v.Local.iRetIndex)
+		gui.F_Maintenance.cboProfile.ListIndex(v.Local.iRetIndex)
+		'Add Name Format
+		gui.F_Maintenance.chkAddProjectName.Value(v.DataTable.loadProfileDT(4).FieldValue!FieldVal)
+		gui.F_Maintenance.chkAddUsername.Value(v.DataTable.loadProfileDT(5).FieldValue!FieldVal)
+		gui.F_Maintenance.chkAddTerminal.Value(v.DataTable.loadProfileDT(6).FieldValue!FieldVal)
+		gui.F_Maintenance.chkAddDate.Value(v.DataTable.loadProfileDT(7).FieldValue!FieldVal)
+		gui.F_Maintenance.chkAddTimeStamp.Value(v.DataTable.loadProfileDT(8).FieldValue!FieldVal)
+		'Group Format Header
+		
+		gui.F_Maintenance.chk_H-BuyerID.Value(v.DataTable.loadProfileDT(9).FieldValue!FieldVal)
+		gui.F_Maintenance.chk_H-PO_Number.Value(v.DataTable.loadProfileDT(10).FieldValue!FieldVal)
+		gui.F_Maintenance.chk_H-Ship-To.Value(v.DataTable.loadProfileDT(11).FieldValue!FieldVal)
+		gui.F_Maintenance.chk_H-DueDate.Value(v.DataTable.loadProfileDT(12).FieldValue!FieldVal)
+		'Group Format Line	
+		gui.F_Maintenance.chk_L-PartNum.Value(v.DataTable.loadProfileDT(13).FieldValue!FieldVal)
+		gui.F_Maintenance.chk_L-PO-LineNbr.Value(v.DataTable.loadProfileDT(14).FieldValue!FieldVal)		
+		gui.F_Maintenance.chk_L-User1.Value(v.DataTable.loadProfileDT(15).FieldValue!FieldVal)	
+		'Read Date Format
+		f.Intrinsic.Control.SelectCase(v.DataTable.loadProfileDT(16).FieldValue!FieldValTrim)
+			f.Intrinsic.Control.Case("1")
+				gui.F_Maintenance.optDateFormat1.Value(true)
+				gui.F_Maintenance.optDateFormat2.Value(false)
+				gui.F_Maintenance.optDateFormat3.Value(false)
+				gui.F_Maintenance.optDateFormat4.Value(false)
+				gui.F_Maintenance.optDateFormat5.Value(false)
+				v.Global.sDateFormat.Set(1)
+			f.Intrinsic.Control.Case("2")
+				gui.F_Maintenance.optDateFormat1.Value(false)
+				gui.F_Maintenance.optDateFormat2.Value(true)
+				gui.F_Maintenance.optDateFormat3.Value(false)
+				gui.F_Maintenance.optDateFormat4.Value(false)
+				gui.F_Maintenance.optDateFormat5.Value(false)
+				v.Global.sDateFormat.Set(2)
+			f.Intrinsic.Control.Case("3")
+				gui.F_Maintenance.optDateFormat1.Value(false)
+				gui.F_Maintenance.optDateFormat2.Value(false)
+				gui.F_Maintenance.optDateFormat3.Value(true)
+				gui.F_Maintenance.optDateFormat4.Value(false)
+				gui.F_Maintenance.optDateFormat5.Value(false)
+				v.Global.sDateFormat.Set(3)
+			f.Intrinsic.Control.Case("4")
+				gui.F_Maintenance.optDateFormat1.Value(false)
+				gui.F_Maintenance.optDateFormat2.Value(false)
+				gui.F_Maintenance.optDateFormat3.Value(false)
+				gui.F_Maintenance.optDateFormat4.Value(True)
+				gui.F_Maintenance.optDateFormat5.Value(false)
+				v.Global.sDateFormat.Set(4)
+			f.Intrinsic.Control.Case("5")
+				gui.F_Maintenance.optDateFormat1.Value(false)
+				gui.F_Maintenance.optDateFormat2.Value(false)
+				gui.F_Maintenance.optDateFormat3.Value(false)
+				gui.F_Maintenance.optDateFormat4.Value(false)
+				gui.F_Maintenance.optDateFormat5.Value(True)
+				v.Global.sDateFormat.Set(5)
+		f.Intrinsic.Control.EndSelect
+		'Line Selection
+		gui.F_Maintenance.chkHeaderLineA.Value(v.DataTable.loadProfileDT(17).FieldValue!FieldVal)
+		gui.F_Maintenance.chkHeaderLineB.Value(v.DataTable.loadProfileDT(18).FieldValue!FieldVal)
+		gui.F_Maintenance.chkHeaderLineC.Value(v.DataTable.loadProfileDT(19).FieldValue!FieldVal)
+		gui.F_Maintenance.chkHeaderLineN.Value(v.DataTable.loadProfileDT(20).FieldValue!FieldVal)
+		gui.F_Maintenance.chkLine1.Value(v.DataTable.loadProfileDT(21).FieldValue!FieldVal)
+		gui.F_Maintenance.chkLine2.Value(v.DataTable.loadProfileDT(22).FieldValue!FieldVal)
+		gui.F_Maintenance.chkLineN.Value(v.DataTable.loadProfileDT(23).FieldValue!FieldVal)
+		gui.F_Maintenance.chkShipSchedM.Value(v.DataTable.loadProfileDT(24).FieldValue!FieldVal)
+		
+		gui.F_Maintenance.chkRowTitles.Value(v.DataTable.loadProfileDT(25).FieldValue!FieldVal)
+		
+		'Titles file name
+		gui.F_Maintenance.txttitlesFileLocation.Text(v.DataTable.loadProfileDT(26).FieldValue!FieldVal)
+		v.Local.iRecordCount.Set(26)
+		
+		'Titles grid
+		f.Data.DataView.SetFilter("loadProfileDT","loadProfileDV","FieldType='FieldHeader'")
+		f.Intrinsic.Control.If(v.DataView.loadProfileDT!loadProfileDV.RowCount,>,0)
+			f.Intrinsic.Control.If(v.DataTable.fieldtitlesDT.Exists)
+				f.Data.DataTable.Close("fieldtitlesDT")
+			f.Intrinsic.Control.EndIf
+			f.Data.DataTable.Create("FieldTitlesDT",true)
+			v.global.bLoadedFromDB.Set(true)
+			
+			'Dictionary to match a column title to title name.
+			f.Data.Dictionary.Exists("fieldtitleDictionary", v.Local.bExists)
+			f.Intrinsic.Control.If(v.Local.bExists)
+				f.Data.Dictionary.Close("fieldtitleDictionary")
+			f.Intrinsic.Control.EndIf
+			f.Data.Dictionary.Create("fieldtitleDictionary")
+			
+			'Add at least one column and one row to get started			
+			f.Data.DataTable.AddColumn("FieldTitlesDT",v.Local.iCnt,"String")
+			f.Data.DataTable.AddRow("FieldTitlesDT",v.Local.iCnt.String,v.DataView.loadProfileDT!loadProfileDV(0).FieldValue!FieldValTrim)
+			f.Data.DataTable.AddRow("FieldTitlesDT",v.Local.iCnt.String,v.DataView.loadProfileDT!loadProfileDV(1).FieldValue!FieldValTrim)
+			f.Data.Dictionary.AddItem("fieldtitleDictionary", v.Local.iCnt.String, v.DataView.loadProfileDT!loadProfileDV(0).FieldValue!FieldValTrim)
+			f.Intrinsic.Control.For(v.Local.iCnt,2,v.DataView.loadProfileDT!loadProfileDV.RowCount--,1)
+				f.Data.DataTable.AddColumn("FieldTitlesDT",v.Local.iColCount,"String")
+				f.Data.DataTable.SetValue("FieldTitlesDT",0,v.Local.iColCount,v.DataView.loadProfileDT!loadProfileDV(v.Local.iCnt).FieldValue!FieldValTrim)
+				f.Data.Dictionary.AddItem("fieldtitleDictionary", v.Local.iColCount, v.DataView.loadProfileDT!loadProfileDV(v.Local.iCnt).FieldValue!FieldValTrim)
+				f.Intrinsic.Math.Add(v.Local.iCnt,1,v.Local.iCnt)
+				f.Intrinsic.Control.If(v.Local.iCnt,>,v.DataView.loadProfileDT!loadProfileDV.RowCount--)
+					f.Intrinsic.Control.ExitFor
+				f.Intrinsic.Control.EndIf
+				f.Data.DataTable.SetValue("FieldTitlesDT",1,v.Local.iColCount,v.DataView.loadProfileDT!loadProfileDV(v.Local.iCnt).FieldValue!FieldValTrim)
+				f.Intrinsic.Math.Add(v.Local.iRecordCount,2,v.local.iRecordCount)
+				f.Intrinsic.Math.Add(v.Local.iColCount,1,v.Local.iColCount)
+			f.Intrinsic.Control.Next(v.Local.iCnt)
+			gui.F_Maintenance.GsGcFieldtitles.AddGridviewFromDatatable("FieldTitlesGV","FieldTitlesDT")
+			f.Intrinsic.Control.CallSub(gridPropertiesFieldtitles)
+			gui.F_Maintenance.GsGcFieldtitles.MainView("FieldTitlesGV")
+			gui.F_Maintenance.GsGcFieldtitles.Visible(True)
+			f.Intrinsic.UI.ChangeWaitStatus("Loading profile...", 50, 0, 100)
+		f.Intrinsic.Control.EndIf
+		
+		'Get the Field Info: we will need it to join to the header, line, and ship schedule records
+		'Note: Setting Required = True for any fields that match, so that dictionaries used in populating selected options in selection screen will work
+		f.ODBC.Connection!con.OpenCompanyConnection
+			f.Data.DataTable.CreateFromSQL("dtFieldInfo","con","Select Ltrim(Rtrim(FieldTitle)) as FieldTitle, FieldType, RecordType, FieldTitleID, Convert(1,SQL_BIT) as Required, VisibleID from GCG_5523_FIELDS_INFO WHERE VISIBLEID=1")
+		f.ODBC.Connection!con.Close	
+		
+		'Join the profile items to their field info
+		f.Data.DataView.SetFilter("loadProfileDT","loadProfileDV","FieldType IN ('XLines','Header','Line','Ship')")
+		f.Intrinsic.UI.ChangeWaitStatus("Loading profile...", 75, 0, 100)
+		
+		f.Intrinsic.Control.If(v.DataView.loadProfileDT!loadProfileDV.RowCount,>,0)
+			f.Data.Linq.Join("InnerJoin","dataview","loadProfileDT","loadProfileDV*!*A","datatable","dtFieldInfo*!*B","A.FieldTitle=B.FieldTitle","A.Fieldtitle*!*B.RecordTypE*!*B.required*!*B.FieldTitleID*!*B.VisibleID*!*B.FieldType*!*A.FieldValue as TitleNumber*!*A.TitleName*!*A.FieldType as SourceFieldType","","","","dtProfileFieldInfo",True)
+			
+			f.Data.DataTable.FillFromDictionary("dtProfileFieldInfo","fieldtitleDictionary","TitleNumber","TitleName")
+			f.Intrinsic.Control.If(v.DataTable.dtprofilefieldinfo.RowCount,=,0)
+				f.Intrinsic.Control.ExitSub
+			f.Intrinsic.Control.EndIf
+			
+			f.Data.DataView.Create("dtProfileFieldInfo","dvProfileFieldInfo")
+			
+			'Creates DropdownList with a blank space first and then all the Field titles.
+			f.Intrinsic.String.Build(" *!*{0}", v.DataTable.fieldtitlesDT.FieldNames, v.Local.sDropdownList)
+			
+			'X and header records
+			f.Data.DataView.SetFilter("dtProfileFieldInfo","dvProfileFieldInfo","SourceFieldType IN ('XLines','Header')")
+			F.Data.DataView.ToDataTable("dtProfileFieldInfo","dvProfileFieldInfo","headerDT",True)
+			f.Data.DataView.Create("headerDT", "headerDV", 22)
+			gui.F_Maintenance.GsGcHeaderFields.AddGridviewFromDataview("headerGV", "headerDT", "headerDV")
+			f.Intrinsic.Control.CallSub(gridPropertiestitleMatch, passedDT, "headerDT", passedGsGC, "GsGcHeaderFields", passedGV, "headerGV")
+			gui.F_Maintenance.GsGcHeaderFields.ColumnEdit("headerGV","titleNumber", "Dropdownlist", v.Local.sDropdownList)
+			gui.F_Maintenance.GsGcHeaderFields.MainView("headerGV")
+			gui.F_Maintenance.frmHeader.Enabled(True)
+			
+			'Lines records
+			f.Data.DataView.SetFilter("dtProfileFieldInfo","dvProfileFieldInfo","SourceFieldType IN ('Line')")
+			F.Data.DataView.ToDataTable("dtProfileFieldInfo","dvProfileFieldInfo","LineDT",True)
+			f.Data.DataView.Create("LineDT", "LineDV", 22)
+			gui.F_Maintenance.GsGcLineFields.AddGridviewFromDataview("LineGV", "LineDT", "LineDV")
+			f.Intrinsic.Control.CallSub(gridPropertiestitleMatch, passedDT, "LineDT", passedGsGC, "GsGcLineFields", passedGV, "LineGV")
+			gui.F_Maintenance.GsGcLineFields.ColumnEdit("LineGV","titleNumber", "Dropdownlist", v.Local.sDropdownList)
+			gui.F_Maintenance.GsGcLineFields.MainView("LineGV")
+			gui.F_Maintenance.frmLine.Enabled(True)
+			
+			'Ship schedule records
+			f.Data.DataView.SetFilter("dtProfileFieldInfo","dvProfileFieldInfo","SourceFieldType IN ('Ship')")
+			F.Data.DataView.ToDataTable("dtProfileFieldInfo","dvProfileFieldInfo","shipDT",True)
+			f.Data.DataView.Create("shipDT", "shipDV", 22)
+			gui.F_Maintenance.GsGcShipSchedSelectFields.AddGridviewFromDataview("shipGV", "shipDT", "shipDV")
+			f.Intrinsic.Control.CallSub(gridPropertiestitleMatch, passedDT, "shipDT", passedGsGC, "GsGcShipSchedSelectFields", passedGV, "shipGV")
+			gui.F_Maintenance.GsGcShipSchedSelectFields.ColumnEdit("shipGV","titleNumber", "Dropdownlist", v.Local.sDropdownList)
+			gui.F_Maintenance.GsGcShipSchedSelectFields.MainView("shipGV")
+			gui.F_Maintenance.frmShipSchedule.Enabled(True)
+			
+			'f.Intrinsic.Control.CallSub(Deserialize)
+		f.Intrinsic.Control.EndIf	
+		f.Intrinsic.UI.ChangeWaitStatus("Loading profile...", 100, 0, 100)
+		f.Intrinsic.UI.CloseWaitDialog
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdOpen_Click.End
+
+Program.Sub.cmdSaveProfile_Click.Start
+v.Local.sProjectName.Declare(string)
+v.Local.sCsvDefaultLocFile.Declare(string)
+v.Local.sEdiDefaultDestFolder.Declare(string)
+v.Local.sFormat.Declare(string)
+v.Local.sTemp.Declare(string)
+v.Local.iCnt.Declare(long)
+v.Local.iOrderID.Declare(long)
+v.Local.iTempCnt.Declare(long)
+v.Local.sRet.Declare(string)
+v.Local.bLicense.Declare(boolean)
+v.Local.sDtFieldName.Declare(string)
+v.Local.sSQL.Declare(string)
+v.Local.iColCnt.Declare(long)
+v.Local.sColName.Declare(string)
+v.Local.sPath.Declare
+
+f.Intrinsic.Control.Try
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!txtProjectName.Text!FieldValTrim, =, "")
+		f.Intrinsic.UI.Msgbox("No project selected.")
+		f.Intrinsic.Control.ExitSub
+	f.Intrinsic.Control.EndIf
+
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!txtDefaultLocCSV.Text!FieldValTrim, =, "")
+		f.Intrinsic.UI.Msgbox("No Inbound File Location Folder.")
+		f.Intrinsic.Control.ExitSub
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!txtDefaultDestEDI.Text!FieldValTrim, =, "")
+		f.Intrinsic.UI.Msgbox("No Destination Location Folder.")
+		f.Intrinsic.Control.ExitSub
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!cboProfile.Value!FieldValTrim, =, "")
+		f.Intrinsic.UI.Msgbox("No Profile Selected.")
+		f.Intrinsic.Control.ExitSub
+	f.Intrinsic.Control.EndIf	
+	
+	f.Intrinsic.UI.InvokeWaitDialog("Saving...")
+	'Creates a datatable matching the Data Table in PSQL. Sets Defaults Values.
+	f.Data.DataTable.Create("profileDT", false)
+	f.Data.DataTable.AddColumn("profileDT", "FieldTitle", "String")
+	f.Data.DataTable.AddColumn("profileDT", "FieldValue", "String")
+	f.Data.DataTable.AddColumn("profileDT", "FieldType", "String")
+	f.Data.DataTable.AddColumn("profileDT", "ProjectName", "String")
+	f.Data.DataTable.AddColumn("profileDT", "UpdatedByUser", "String")
+	f.Data.DataTable.AddColumn("profileDT", "OrderID", "Integer")
+	f.Data.DataTable.AddColumn("profileDT", "FieldTitleID", "String")
+	v.Local.sProjectName.Set(v.Screen.F_Maintenance!txtProjectName.Text!FieldValTrim)
+	v.Local.sCsvDefaultLocFile.Set(v.Screen.F_Maintenance!txtDefaultLocCSV.Text!FieldValTrim)
+	v.Local.sEdiDefaultDestFolder.Set(v.Screen.F_Maintenance!txtDefaultDestEDI.Text!FieldValTrim)
+	
+	v.Local.sFormat.Set(v.Screen.F_Maintenance!cboProfile.Value)
+		
+	'Writing the datatable. Following an specific structure, this is the profile information. The profile is grouped matching the frames in the screen.
+	f.ODBC.Connection!con.opencompanyconnection
+	f.Intrinsic.String.Build("delete from GCG_5523_EDI_OPTIONS WHERE PROJECTNAME='{0}'",v.Local.sProjectName,v.Local.sSQL)
+	f.ODBC.Connection!con.Execute(v.Local.sSQL)
+	f.ODBC.Connection!con.Close
+
+	'Input Data
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "ProjectName", "FieldValue", v.Local.sProjectName.PSQLFriendly, "FieldType", "InputData", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 0)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "CsvDefaultLocFile", "FieldValue", v.Local.sCsvDefaultLocFile, "FieldType", "InputData", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 1)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "EdiDefaultDestFolder", "FieldValue", v.Local.sEdiDefaultDestFolder, "FieldType", "InputData", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 2)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Format", "FieldValue", v.Local.sFormat, "FieldType", "InputData", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 3)
+	
+	'Name Format
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "NameAddProjectName", "FieldValue", v.Screen.F_Maintenance!chkAddProjectName.Value, "FieldType", "NameFormat", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 4)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "NameAddUsername", "FieldValue", v.Screen.F_Maintenance!chkAddUsername.Value, "FieldType", "NameFormat", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 5)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "NameAddTerminal", "FieldValue", v.Screen.F_Maintenance!chkAddTerminal.Value, "FieldType", "NameFormat", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 6)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "NameAddDate", "FieldValue", v.Screen.F_Maintenance!chkAddDate.Value, "FieldType", "NameFormat", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 7)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "NameAddTimeStamp", "FieldValue", v.Screen.F_Maintenance!chkAddTimeStamp.Value, "FieldType", "NameFormat", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 8)
+		
+	'Group Selection	
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Grp_H_Buyer_ID", "FieldValue", v.Screen.F_Maintenance!chk_H-BuyerID.Value, "FieldType", "GroupH_By", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 9)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Grp_H_PO_Number", "FieldValue", v.Screen.F_Maintenance!chk_H-PO_Number.Value, "FieldType", "GroupH_By", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 10)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Grp_H_Ship_To", "FieldValue", v.Screen.F_Maintenance!chk_H-Ship-To.Value, "FieldType", "GroupH_By", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 11)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Grp_H_Due_Date", "FieldValue", v.Screen.F_Maintenance!chk_H-DueDate.Value, "FieldType", "GroupH_By", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 12)
+
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Grp_L_Part_Number", "FieldValue", v.Screen.F_Maintenance!chk_L-PartNum.Value, "FieldType", "GroupL_By", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 13)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Grp_L_PO_Line_Nbr", "FieldValue", v.Screen.F_Maintenance!chk_L-PO-LineNbr.Value, "FieldType", "GroupL_By", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 14)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Grp_L_User_1", "FieldValue", v.Screen.F_Maintenance!chk_L-User1.Value, "FieldType", "GroupL_By", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 15)
+	'DateFormat
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Read_Date_Fortmat", "FieldValue", v.Global.sDateFormat, "FieldType", "LineOptions", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 16)
+
+	'LineSelection
+	'Header
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "HeaderA", "FieldValue", v.Screen.F_Maintenance!chkHeaderLineA.Value, "FieldType", "LineSelection", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 17)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "HeaderB", "FieldValue", v.Screen.F_Maintenance!chkHeaderLineB.Value, "FieldType", "LineSelection", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 18)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "HeaderC", "FieldValue", v.Screen.F_Maintenance!chkHeaderLineC.Value, "FieldType", "LineSelection", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 19)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "HeaderN", "FieldValue", v.Screen.F_Maintenance!chkHeaderLineN.Value, "FieldType", "LineSelection", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 20)
+	'Lines
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Line1", "FieldValue", v.Screen.F_Maintenance!chkLine1.Value, "FieldType", "LineSelection", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 21)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Line2", "FieldValue", v.Screen.F_Maintenance!chkLine2.Value, "FieldType", "LineSelection", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 22)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "LineN", "FieldValue", v.Screen.F_Maintenance!chkLineN.Value, "FieldType", "LineSelection", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, 23)
+	'Ship Sched
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "Read_Ship_Sched_Lines", "FieldValue", v.Screen.F_Maintenance!chkShipSchedM.Value, "FieldType", "LineOptions", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User,OrderID, 24)
+	
+	'First Row Contain Titles
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "First_Row_Contain_Titles", "FieldValue", v.Screen.F_Maintenance!chkRowTitles.Value, "FieldType", "LineOptions", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User,OrderID, 25)
+	
+	'Field title file
+	v.Local.iOrderID.Set(26)
+	f.Data.DataTable.AddRow("profileDT", "Fieldtitle", "#", "FieldValue", v.Screen.F_Maintenance!txttitlesFileLocation.text, "FieldType", "FieldHeaderFile", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User , "OrderID" , v.Local.iOrderID)
+	
+	'In eache type of line record, the script checks it the titleNumber is empty, if it is it writes the titleName, else writes the number (columnIndex.)
+
+	'X Lines
+	f.Intrinsic.Control.If(v.DataTable.headerDT.Exists)
+		f.Intrinsic.Control.For(v.Local.iCnt, 0, 1, 1)
+			f.Intrinsic.Math.Add(v.Local.iOrderID, 1, v.Local.iOrderID)
+			f.Intrinsic.Control.If(v.DataTable.headerDT(v.Local.iCnt).titleNumber!FieldValTrim, =, "",or,v.DataTable.headerDT(v.Local.iCnt).titleNumber!FieldValTrim,=,v.DataTable.headerDT(v.Local.iCnt).titleName!FieldValTrim)
+				v.Local.sTemp.Set(v.DataTable.headerDT(v.Local.iCnt).titleName!FieldValTrim)
+				f.Intrinsic.String.Build("#{0}", v.Local.sTemp, v.Local.sTemp)
+				f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.headerDT(v.Local.iCnt).Fieldtitle!FieldValTrim, "FieldValue", v.Local.sTemp.PSQLFriendly, "FieldType", "XLines", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, v.Local.iOrderID, FieldTitleID, v.DataTable.headerDT(v.Local.iCnt).FieldTitleID!FieldValTrim)
+			f.Intrinsic.Control.Else
+				f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.headerDT(v.Local.iCnt).Fieldtitle!FieldValTrim, "FieldValue", v.DataTable.headerDT(v.Local.iCnt).titleNumber!FieldValTrim, "FieldType", "XLines", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, v.Local.iOrderID, FieldTitleID, v.DataTable.headerDT(v.Local.iCnt).FieldTitleID!FieldValTrim)
+			f.Intrinsic.Control.EndIf			
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+	f.Intrinsic.Control.EndIf		
+	'Up until here the profile line number are set. After this it varies depending on the User's selections. I set the orderId counter at 14 and everytime theres a record to add, I add 1 to the orderId counter.
+
+	'Header >> Starts at row index 2 since the first two lines will always be the X lines
+	f.Intrinsic.Control.If(v.DataTable.headerDT.Exists)
+		v.Local.iTempCnt.Set(v.DataTable.headerDT.RowCount--)
+	
+		f.Intrinsic.Control.For(v.Local.iCnt, 2, v.Local.iTempCnt, 1)
+			f.Intrinsic.Math.Add(v.Local.iOrderID, 1, v.Local.iOrderID)
+			f.Intrinsic.Control.If(v.DataTable.headerDT(v.Local.iCnt).titleNumber!FieldValTrim, =, "",or,v.DataTable.headerDT(v.Local.iCnt).titleNumber!FieldValTrim,=,v.DataTable.headerDT(v.Local.iCnt).titleName!FieldValTrim)
+				v.Local.sTemp.Set(v.DataTable.headerDT(v.Local.iCnt).titleName!FieldValTrim)
+				f.Intrinsic.String.Build("#{0}", v.Local.sTemp, v.Local.sTemp)
+				f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.headerDT(v.Local.iCnt).Fieldtitle!FieldValTrim, "FieldValue", v.Local.sTemp.PSQLFriendly, "FieldType", "Header", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, v.Local.iOrderID, FieldTitleID, v.DataTable.headerDT(v.Local.iCnt).FieldTitleID!FieldValTrim)
+			f.Intrinsic.Control.Else
+				f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.headerDT(v.Local.iCnt).Fieldtitle!FieldValTrim, "FieldValue", v.DataTable.headerDT(v.Local.iCnt).titleNumber!FieldValTrim, "FieldType", "Header", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, v.Local.iOrderID, FieldTitleID, v.DataTable.headerDT(v.Local.iCnt).FieldTitleID!FieldValTrim)
+			f.Intrinsic.Control.EndIf			
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	'Line
+	f.Intrinsic.Control.If(v.DataTable.LineDT.Exists)
+	v.Local.iTempCnt.Set(v.DataTable.LineDT.RowCount--)
+		f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.iTempCnt, 1)		
+			f.Intrinsic.Math.Add(v.Local.iOrderID, 1, v.Local.iOrderID)
+			f.Intrinsic.Control.If(v.DataTable.LineDT(v.Local.iCnt).titleNumber!FieldValTrim, =, "",or,v.DataTable.LineDT(v.Local.iCnt).titleNumber!FieldValTrim,=,v.DataTable.LineDT(v.Local.iCnt).titleName!FieldValTrim)
+				v.Local.sTemp.Set(v.DataTable.LineDT(v.Local.iCnt).titleName!FieldValTrim)
+				f.Intrinsic.String.Build("#{0}", v.Local.sTemp, v.Local.sTemp)
+				f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.LineDT(v.Local.iCnt).Fieldtitle!FieldValTrim, "FieldValue", v.Local.sTemp.PSQLFriendly, "FieldType", "Line", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, v.Local.iOrderID, FieldTitleID, v.DataTable.LineDT(v.Local.iCnt).FieldTitleID!FieldValTrim)
+			f.Intrinsic.Control.Else
+				f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.LineDT(v.Local.iCnt).Fieldtitle!FieldValTrim, "FieldValue", v.DataTable.LineDT(v.Local.iCnt).titleNumber!FieldValTrim, "FieldType", "Line", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, v.Local.iOrderID, FieldTitleID, v.DataTable.LineDT(v.Local.iCnt).FieldTitleID!FieldValTrim)
+			f.Intrinsic.Control.EndIf				
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	'Ship Sched
+	f.Intrinsic.Control.If(v.DataTable.shipDT.Exists)
+	v.Local.iTempCnt.Set(v.DataTable.shipDT.RowCount--)
+		f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.iTempCnt, 1)
+			f.Intrinsic.Math.Add(v.Local.iOrderID, 1, v.Local.iOrderID)
+			f.Intrinsic.Control.If(v.DataTable.shipDT(v.Local.iCnt).titleNumber!FieldValTrim, =, "",or,v.DataTable.shipDT(v.Local.iCnt).titleNumber!FieldValTrim,=,v.DataTable.shipDT(v.Local.iCnt).titleName!FieldValTrim)
+				v.Local.sTemp.Set(v.DataTable.shipDT(v.Local.iCnt).titleName!FieldValTrim)
+				f.Intrinsic.String.Build("#{0}", v.Local.sTemp, v.Local.sTemp)
+				f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.shipDT(v.Local.iCnt).Fieldtitle!FieldValTrim, "FieldValue", v.Local.sTemp.PSQLFriendly, "FieldType", "Ship", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, v.Local.iOrderID, FieldTitleID, v.DataTable.shipDT(v.Local.iCnt).FieldTitleID!FieldValTrim)
+			f.Intrinsic.Control.Else
+				f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.shipDT(v.Local.iCnt).Fieldtitle!FieldValTrim, "FieldValue", v.DataTable.shipDT(v.Local.iCnt).titleNumber!FieldValTrim, "FieldType", "Ship", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User, OrderID, v.Local.iOrderID, FieldTitleID, v.DataTable.shipDT(v.Local.iCnt).FieldTitleID!FieldValTrim)
+			f.Intrinsic.Control.EndIf					
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+		'Field titles	
+	
+	f.Intrinsic.Control.If(v.global.bLoadedFromDB,=,True)
+		'This means that the data has been loaded from the DB
+		gui.F_Maintenance.GsGcFieldtitles.GetColumnCount("FieldTitlesGV",v.Local.iColCnt)
+		f.Intrinsic.Math.Sub(v.Local.iColCnt,1,v.Local.iColCnt)
+		f.Intrinsic.Control.For(v.Local.iCnt,0,v.Local.iColCnt,1)
+			f.Intrinsic.Math.Add(v.Local.iOrderID, 1, v.Local.iOrderID)
+			f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.Local.iCnt, "FieldValue", v.DataTable.fieldtitlesDT(0).[v.Local.iCnt]!FieldValTrim, "FieldType", "FieldHeader", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User,OrderID, v.Local.iOrderID)
+			f.Intrinsic.Math.Add(v.Local.iOrderID, 1, v.Local.iOrderID)
+			f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.fieldtitlesDT(0).[v.Local.iCnt]!FieldValTrim, "FieldValue", v.DataTable.fieldtitlesDT(1).[v.Local.iCnt]!FieldValTrim, "FieldType", "FieldHeader", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User,OrderID, v.Local.iOrderID, FieldTitleID, 0)
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+		'f.Intrinsic.String.Split(v.DataTable.dtFieldTitles(0).FieldValue, "*!*", v.Local.sDtFieldName)
+		'v.DataTable.dtFieldTitles.FieldNames
+	f.Intrinsic.Control.Else
+		f.Intrinsic.String.Split(v.DataTable.fieldtitlesDT.FieldNames, "*!*", v.Local.sDtFieldName)
+		f.Intrinsic.Control.For(v.Local.iCnt,0,v.Local.sDtFieldName.UBound,1)
+			f.Intrinsic.Math.Add(v.Local.iOrderID,1,v.Local.iOrderID)
+			f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.Local.iCnt, "FieldValue", v.DataTable.fieldtitlesDT(0).[v.Local.iCnt]!FieldValTrim, "FieldType", "FieldHeader", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User,OrderID, v.Local.iOrderID)
+			f.Intrinsic.Math.Add(v.Local.iOrderID, 1, v.Local.iOrderID)
+			f.Data.DataTable.AddRow("profileDT", "Fieldtitle", v.DataTable.fieldtitlesDT(0).[v.Local.iCnt]!FieldValTrim, "FieldValue", v.DataTable.fieldtitlesDT(1).[v.Local.iCnt]!FieldValTrim, "FieldType", "FieldHeader", "ProjectName", v.Local.sProjectName.PSQLFriendly, "UpdatedByUser", v.Caller.User,OrderID, v.Local.iOrderID, FieldTitleID, 0)
+		f.Intrinsic.Control.Next(v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+
+	f.Global.General.ISLICENSEDBYMODULENAME("EDI", v.Local.bLicense)
+	f.Intrinsic.Control.If(v.Local.bLicense, =, false)
+		f.Intrinsic.String.Build("{0}\ediUpload.csv", v.Caller.FilesDir, v.Local.sPath)
+		f.Data.DataTable.SaveToCSV("profileDT", v.Local.sPath, true)
+		f.Intrinsic.UI.Msgbox("No EDI License found. Please contact your Account Rep.")
+		f.Intrinsic.Control.End
+	f.Intrinsic.Control.EndIf
+
+	'Save to Database
+	f.Data.DataTable.AcceptChanges("profileDT")
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.SaveToDB("profileDT", "con", "GCG_5523_EDI_OPTIONS", "ProjectName*!*OrderID", 128)	
+		f.Intrinsic.String.Build("{0}\ediUpload.csv", v.Caller.FilesDir, v.Local.sPath)
+		f.Data.DataTable.SaveToCSV("profileDT", v.Local.sPath, true)
+		'Save Preproc
+		f.Intrinsic.String.Build("Delete from GCG_5523_PRE_PROC where ProjectToUse = '{0}'", v.Local.sProjectName.PSQLFriendly, v.Local.sSQL)
+		f.ODBC.Connection!con.Execute(v.Local.sSQL)
+		f.Intrinsic.String.Build("Insert into  GCG_5523_PRE_PROC Values ('{0}', '{1}', '{2}')", v.Local.sProjectName, v.Screen.F_Maintenance!chk1.Value, v.Screen.F_Maintenance!txtPreProcessor.Text, v.Local.ssql)
+		f.ODBC.Connection!con.Execute(v.Local.sSQL)
+	f.ODBC.Connection!con.Close
+	f.Intrinsic.UI.CloseWaitDialog
+	f.Intrinsic.UI.Msgbox("Successful")
+f.Intrinsic.Control.Catch
+	f.Intrinsic.UI.CloseWaitDialog
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdSaveProfile_Click.End
+
+'-------DATA MOVEMENT----------
+Program.Sub.ErrorMsg.Start
+v.Local.sError.Declare
+
+'Closes ODBC connection, default to connection : "con"
+f.Intrinsic.Control.If(v.ODBC!con.State, =, 1)
+	f.ODBC.Connection!con.Close
+f.Intrinsic.Control.EndIf
+
+'Closes ODBC connection, default to connection : "common"
+f.Intrinsic.Control.If(v.ODBC!common.State, =, 1)
+	f.ODBC.Connection!common.Close
+f.Intrinsic.Control.EndIf
+
+'Generic Error message.
+f.Intrinsic.String.Build("Project GCG_5523_EDI_OptionsMaintenance.g2u {0}{0}Subroutine: {1}{0}Error: {2} with Description: {3}", v.Ambient.NewLine, v.Args.CurrentSub, v.Ambient.ErrorNumber, v.Ambient.ErrorDescription, v.Local.sError)
+f.Intrinsic.UI.Msgbox(v.Local.sError)
+Program.Sub.ErrorMsg.End
+
+Program.Sub.selectionGridProperties.Start
+'HeaderFontBold
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "Fieldtitle", "HeaderFontBold", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "RecordType", "HeaderFontBold", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "Required", "HeaderFontBold", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldTitleId", "HeaderFontBold", True)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleNumber", "HeaderFontBold", True)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleName", "HeaderFontBold", True)
+	
+'Visible
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Fieldtitle", "Visible", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"RecordType", "Visible", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Required", "Visible", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldTitleId", "Visible", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "VisibleID", "Visible", False)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldType", "Visible", False)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "SourceFieldType", "Visible", False)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleNumber", "Visible", True)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleName", "Visible", True)
+
+	
+'ReadOnly
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Fieldtitle", "ReadOnly", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"RecordType", "ReadOnly", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Required", "ReadOnly", False)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldTitleId", "ReadOnly", True)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleNumber", "ReadOnly", True)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleName", "ReadOnly", True)
+	
+'AllowEdit
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Fieldtitle", "AllowEdit", False)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"RecordType", "AllowEdit", False)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Required", "AllowEdit", True)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldTitleId", "AllowEdit", False)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleNumber", "AllowEdit", False)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleName", "AllowEdit", False)
+	
+'HeaderHAlignment
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Fieldtitle", "HeaderHAlignment", "Near")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"RecordType", "HeaderHAlignment", "Near")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Required", "HeaderHAlignment", "Near")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldTitleId", "HeaderHAlignment", "Near")
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleNumber", "HeaderHAlignment", "Near")
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleName", "HeaderHAlignment", "Near")
+	
+'CellHAlignment
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Fieldtitle", "CellHAlignment", "Near")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"RecordType", "CellHAlignment", "Center")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Required", "CellHAlignment", "Center")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldTitleId", "CellHAlignment", "Center")
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleNumber", "CellHAlignment", "Center")
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleName", "CellHAlignment", "Center")
+	
+'Caption
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Fieldtitle", "Caption", "Field title")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"RecordType", "Caption", "Record Type")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Required", "Caption", "Select")
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldTitleId", "Caption", "Title ID")
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleNumber", "Caption", "Title Number")
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleName", "Caption", "Title Name")
+	
+'VisibleIndex
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Fieldtitle", "VisibleIndex", 0)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"RecordType", "VisibleIndex", 1)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName,"Required", "VisibleIndex", 2)
+	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "FieldTitleId", "VisibleIndex", 3)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleNumber", "VisibleIndex", 4)
+'	gui.F_Selection.GsGcSelection.SetColumnProperty(v.Args.GvName, "titleName", "VisibleIndex", 5)
+	
+	gui.F_Selection.GsGcSelection.BestFitColumns(v.Args.GvName)
+Program.Sub.selectionGridProperties.End
+
+Program.Sub.gridPropertiesFieldtitles.Start
+v.Local.sDtFieldName.Declare
+v.Local.iCnt.Declare
+
+f.Intrinsic.Control.Try
+	v.Local.sDtFieldName.Set(v.DataTable.fieldtitlesDT.FieldNames)
+	f.Intrinsic.String.Split(v.DataTable.fieldtitlesDT.FieldNames, "*!*", v.Local.sDtFieldName)
+	
+	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.sDtFieldName.UBound, 1)
+		'HeaderFontBold
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "HeaderFontBold", True)
+		'HeaderBackColor
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "HeaderBackColor", v.Color.GSS)
+		'HeaderForeColor
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "HeaderForeColor", v.Color.White)
+		'CellFontBold
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "CellFontBold", True)
+		'Visible
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "Visible", True)
+		'ReadOnly
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "ReadOnly", True)
+		'AllowEdit
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "AllowEdit", False)
+		'HeaderHAlignment
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "HeaderHAlignment", "Center")
+		'CellHAlignment
+		gui.F_Maintenance.GsGcFieldtitles.SetColumnProperty("fieldtitlesGV", v.Local.sDtFieldName(v.Local.iCnt), "CellHAlignment", "Near")
+	f.Intrinsic.Control.Next(v.Local.iCnt)	
+	gui.F_Maintenance.GsGcFieldtitles.BestFitColumns("fieldtitlesGV")
+	gui.F_Maintenance.GsGcFieldtitles.SetGridviewProperty("fieldtitlesGV", "OptionsViewColumnAutoWidth", False)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.gridPropertiesFieldtitles.End
+
+Program.Sub.gridPropertiestitleMatch.Start
+v.Local.sDtFieldName.Declare
+v.Local.iCnt.Declare
+
+f.Intrinsic.Control.Try
+	v.Local.sDtFieldName.Set(v.DataTable.[v.Args.passedDT].FieldNames)
+	f.Intrinsic.String.Split(v.DataTable.[v.Args.passedDT].FieldNames, "*!*", v.Local.sDtFieldName)
+	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.Local.sDtFieldName.UBound, 1)
+		'HeaderFontBold
+		gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, v.Local.sDtFieldName(v.Local.iCnt), "HeaderFontBold", True)
+		'HeaderBackColor
+		gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, v.Local.sDtFieldName(v.Local.iCnt), "HeaderBackColor", v.Color.LtGray)
+		'Visible
+		gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, v.Local.sDtFieldName(v.Local.iCnt), "Visible", True)
+		'ReadOnly
+		gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, v.Local.sDtFieldName(v.Local.iCnt), "ReadOnly", True)
+		'AllowEdit
+		gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, v.Local.sDtFieldName(v.Local.iCnt), "AllowEdit", False)
+		'HeaderHAlignment
+		gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, v.Local.sDtFieldName(v.Local.iCnt), "HeaderHAlignment", "Center")
+		'CellHAlignment
+		gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, v.Local.sDtFieldName(v.Local.iCnt), "CellHAlignment", "Center")
+	f.Intrinsic.Control.Next(v.Local.iCnt)	
+	
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "titleNumber", "ReadOnly", False)
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "titleNumber", "AllowEdit", True)
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "titleName", "ReadOnly", False)
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "titleName", "AllowEdit", True)
+
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "Fieldtitle", "CellHAlignment", "Near")
+
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "Fieldtitle", "CellTrimming", "Default")
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "Fieldtitle", "Fixed", "Left")
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "titleName", "CellHAlignment", "Near")
+	
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "Fieldtitle", "Caption", "Field title")
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV,"RecordType", "Caption", "Record Type")
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV,"Required", "Caption", "Select")
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "FieldTitleId", "Caption", "Title ID")
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "titleNumber", "Caption", "Column")
+	gui.F_Maintenance.[v.Args.passedGsGC].SetColumnProperty(v.Args.passedGV, "titleName", "Caption", "Value")
+	
+	gui.F_Maintenance.[v.Args.passedGsGC].setcolumnproperty(v.Args.passedGV, "FieldType", "MinWidth", "75")
+	gui.F_Maintenance.[v.Args.passedGsGC].setcolumnproperty(v.Args.passedGV, "FieldTitle", "MinWidth", "75")
+	
+	gui.F_Maintenance.[v.Args.passedGsGC].setcolumnproperty(v.Args.passedGV, "SourceFieldType", "Visible", False)
+	gui.F_Maintenance.[v.Args.passedGsGC].setcolumnproperty(v.Args.passedGV, "FieldTitleId", "Visible", False)
+	gui.F_Maintenance.[v.Args.passedGsGC].setcolumnproperty(v.Args.passedGV, "FieldType", "Visible", False)
+	gui.F_Maintenance.[v.Args.passedGsGC].setcolumnproperty(v.Args.passedGV, "Required", "Visible", False)
+	gui.F_Maintenance.[v.Args.passedGsGC].setcolumnproperty(v.Args.passedGV, "VisibleID", "Visible", False)
+	
+	gui.F_Maintenance.[v.Args.passedGsGC].BestFitColumns(v.Args.passedGV)
+	gui.F_Maintenance.[v.Args.passedGsGC].SetGridviewProperty(v.Args.passedGV, "OptionsViewColumnAutoWidth", True)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.gridPropertiestitleMatch.End
+
+Program.Sub.changelNameLabel.Start
+v.Local.iCnt.Declare
+v.Local.sTemp.Declare
+v.Local.sLabelText.Declare
+v.Local.sProjectName.Declare
+
+v.Local.sProjectName.Set(v.Screen.F_Maintenance!txtProjectName.Text)
+
+f.Intrinsic.Control.Try
+	v.Local.iCnt.Set(0)
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkAddProjectName.Value, =, 1)
+		v.Local.sTemp(v.Local.iCnt).Set(v.Local.sProjectName.Trim)
+		f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+		v.Local.sTemp.RedimPreserve(0, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkAddUsername.Value, =, 1)
+		v.Local.sTemp(v.Local.iCnt).Set(v.Caller.User)
+		f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+		v.Local.sTemp.RedimPreserve(0, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkAddTerminal.Value, =, 1)
+		v.Local.sTemp(v.Local.iCnt).Set(v.Caller.Terminal)
+		f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+		v.Local.sTemp.RedimPreserve(0, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkAddDate.Value, =, 1)
+		v.Local.sTemp(v.Local.iCnt).Set(v.Ambient.Date.PervasiveDate)
+		f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+		v.Local.sTemp.RedimPreserve(0, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Screen.F_Maintenance!chkAddTimeStamp.Value, =, 1)
+		v.Local.sTemp(v.Local.iCnt).Set(v.Ambient.Time.PSQLFriendly)
+		f.Intrinsic.Math.Add(v.Local.iCnt, 1, v.Local.iCnt)
+		v.Local.sTemp.RedimPreserve(0, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.Local.sTemp(v.Local.sTemp.UBound), =, "")
+		f.Intrinsic.Math.Sub(v.Local.sTemp.UBound, 1, v.Local.iCnt)
+		v.Local.sTemp.RedimPreserve(0, v.Local.iCnt)
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.String.Join(v.Local.sTemp, "_", v.Local.sLabelText)
+	f.Intrinsic.String.Build("EDI850_{0}", v.Local.sLabelText, v.Local.sLabelText)
+	gui.F_Maintenance.lblNameExample.Text(v.Local.sLabelText)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.changelNameLabel.End
+
+Program.Sub.loadFormats.Start
+v.Local.iCnt.Declare
+f.Intrinsic.Control.Try
+	gui.F_Maintenance.cboProfile.ClearItems
+	gui.F_Maintenance.cboProfile.AddItem("Standard")
+'	f.ODBC.Connection!con.OpenCompanyConnection
+'		f.Data.DataTable.CreateFromSQL("ProfilesNamesDT", "con", "Select Distinct ProfileName from GCG_5523_PROFILES where RecordType = 'R'", false)
+'	f.ODBC.Connection!con.Close
+'	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.DataTable.ProfilesNamesDT.RowCount--, 1)
+'		gui.F_Maintenance.cboProfile.AddItem(v.DataTable.ProfilesNamesDT(v.Local.iCnt).ProfileName!FieldValTrim)
+'	f.Intrinsic.Control.Next(v.Local.iCnt)
+'	f.Data.DataTable.Close("ProfilesNamesDT")
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.loadFormats.End
+
+Program.Sub.closeDts.Start
+f.Intrinsic.Control.Try
+	f.Intrinsic.Control.If(v.DataView.headerDT!headerDV.Exists, =, true)
+		f.Data.DataView.Close("headerDT", "headerDV")
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.headerDT.Exists, =, true)
+		f.Data.DataTable.Close("headerDT")
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataView.LineDT!LineDV.Exists, =, true)
+		f.Data.DataView.Close("LineDT", "LineDV")
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.LineDT.Exists, =, true)
+		f.Data.DataTable.Close("LineDT")
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataView.shipDT!shipDV.Exists, =, true)
+		f.Data.DataView.Close("shipDT", "shipDV")
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.Control.If(v.DataTable.shipDT.Exists, =, true)
+		f.Data.DataTable.Close("shipDT")
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry	
+Program.Sub.closeDts.End
+
+Program.Sub.checkProfiles.Start
+v.Local.sFileLoc.Declare
+v.Local.sSQL.Declare
+f.Intrinsic.Control.Try
+	'Profile 1 - Standard 
+	f.Intrinsic.String.Build("{0}\GCG_5523_Profile1_Standard.g2u", v.Caller.GasDir, v.Local.sFileLoc)
+	
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("standardDT", "con", "Select * from GCG_5523_PROFILES where ProfileName = 'Standard' and RecordType = 'R'")
+	f.ODBC.Connection!con.Close
+	
+	f.Intrinsic.Control.If(v.DataTable.standardDT.RowCount, =, 0)
+		f.Intrinsic.String.Build("Insert into GCG_5523_PROFILES (ProfileName, ScriptLocation, RecordType) Values ('Standard', '{0}', 'R')", v.Local.sFileLoc, v.Local.sSQL)
+		f.ODBC.Connection!con.OpenCompanyConnection
+			f.ODBC.Connection!con.Execute(v.Local.sSQL)
+		f.ODBC.Connection!con.Close
+	f.Intrinsic.Control.ElseIf(v.DataTable.standardDT.RowCount, =, 1)
+		f.Intrinsic.String.Build("Update GCG_5523_PROFILES Set ScriptLocation = '{0}' Where ProfileName = 'Standard' and RecordType = 'R'", v.Local.sFileLoc, v.Local.sSQL)	
+		f.ODBC.Connection!con.OpenCompanyConnection
+			f.ODBC.Connection!con.Execute(v.Local.sSQL)
+		f.ODBC.connection!con.Close	
+	f.Intrinsic.Control.Else
+		f.Intrinsic.UI.Msgbox("There are multiple Records for Profile Standard and Record Type R, Please contact Global Shop")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataTable.Close("standardDT")
+	
+	'Forecast Profile	
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("standardDT", "con", "Select * from GCG_5523_PROFILES where ProfileName = 'Forecast' and RecordType = 'R'")
+	f.ODBC.Connection!con.Close
+	
+	f.Intrinsic.Control.If(v.DataTable.standardDT.RowCount, =, 0)
+		f.Intrinsic.String.Build("Insert into GCG_5523_PROFILES (ProfileName, ScriptLocation, RecordType) Values ('Forecast', '{0}', 'R')", v.Local.sFileLoc, v.Local.sSQL)
+		f.ODBC.Connection!con.OpenCompanyConnection
+			f.ODBC.Connection!con.Execute(v.Local.sSQL)
+		f.ODBC.Connection!con.Close
+	f.Intrinsic.Control.ElseIf(v.DataTable.standardDT.RowCount, =, 1)
+		f.Intrinsic.String.Build("Update GCG_5523_PROFILES Set ScriptLocation = '{0}' Where ProfileName = 'Forecast' and RecordType = 'R'", v.Local.sFileLoc, v.Local.sSQL)	
+		f.ODBC.Connection!con.OpenCompanyConnection
+			f.ODBC.Connection!con.Execute(v.Local.sSQL)
+		f.ODBC.Connection!con.Close	
+	f.Intrinsic.Control.Else
+		f.Intrinsic.UI.Msgbox("There are multiple Records for Profile Forecasts and Record Type R, Please contact Global Shop")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataTable.Close("standardDT")
+	
+	f.Intrinsic.Control.CallSub(loadFormats)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.checkProfiles.End
+
+Program.Sub.installProfile_Standard.Start
+v.Local.sFileLoc.Declare
+v.Local.sSQL.Declare
+f.Intrinsic.Control.Try
+	'Profile 1, 
+	f.Intrinsic.String.Build("{0}\GCG_5523_Profile1_Standard.g2u", v.Caller.GasDir, v.Local.sFileLoc)
+	f.Intrinsic.String.Build("Update GCG_5523_PROFILES Set ScriptLocation = '{0}' Where ProfileName = 'Standard' and RecordType = 'R'", v.Local.sFileLoc, v.Local.sSQL)
+	
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.ODBC.Connection!con.Execute(v.Local.sSQL)
+	f.ODBC.Connection!con.Close	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.installProfile_Standard.End
+
+Program.Sub.readFieldTitleData.Start
+v.Local.sFilePath.Declare(string)
+V.Local.bFileExists.Declare(boolean)
+f.Intrinsic.Control.Try
+
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("checkDT", "con", "Select * from GCG_5523_FIELDS_INFO")
+	f.ODBC.Connection!con.Close
+	
+	f.Intrinsic.Control.If(v.DataTable.checkDT.RowCount, <>, 162)
+		'Need to delete all rows first before saving all rows as new records
+		f.ODBC.Connection!con.OpenCompanyConnection
+			f.ODBC.Connection!con.Execute("delete from GCG_5523_FIELDS_INFO")
+			
+			f.Intrinsic.String.Build("{0}\CUSTOM\GCG_5523\GCG_5523_EDI_FIELDS_INFO_DATA.csv", v.Caller.GlobalDir, v.Local.sFilePath)
+			f.Intrinsic.File.Exists(v.Local.sFilePath,v.Local.bFileExists)
+			f.Intrinsic.Control.If(v.Local.bFileExists,=,False)
+				f.Intrinsic.UI.Msgbox("The field titles file is not present in your GSS folder structure.  Please contact GSS for support.","Error >> Field Title Setup")
+				f.Intrinsic.Control.End
+			f.Intrinsic.Control.EndIf
+			f.Data.DataTable.CreateFromCSV("tmpEDI_FieldDT", v.Local.sFilePath, "FieldTitle*!*FieldType*!*FieldLenght*!*StartingPosition*!*RecordType*!*Header*!*Line*!*Ship*!*Required*!*FieldTitleID*!*VisibleID", "String*!*String*!*String*!*String*!*String*!*String*!*String*!*String*!*String*!*String*!*String", true)
+			
+			f.Data.DataTable.SaveToDB("tmpEDI_FieldDT", "con", "GCG_5523_FIELDS_INFO", "FieldTitle*!*FieldType*!*FieldLenght*!*StartingPosition*!*RecordType*!*Header*!*Line*!*Ship*!*Required*!*FieldTitleID*!*VisibleID", 128)
+		f.ODBC.Connection!con.Close
+		
+		f.Data.DataTable.Close("tmpEDI_FieldDT")
+	f.Intrinsic.Control.EndIf
+	
+	f.Data.DataTable.Close("checkDT")	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.readFieldTitleData.End
+
+Program.Sub.BuildFilters.Start
+	'Build filters on the fly after loading
+	f.Intrinsic.Control.Try
+		f.Intrinsic.Control.callsub(chkHeaderLineA_Click)
+		f.Intrinsic.Control.callsub(chkHeaderLineB_Click)
+		f.Intrinsic.Control.callsub(chkHeaderLineC_Click)
+		f.Intrinsic.Control.callsub(chkHeaderLineN_Click)
+		f.Intrinsic.Control.callsub(chkLine2_Click)
+		f.Intrinsic.Control.callsub(chkLineN_Click)
+		f.Intrinsic.Control.callsub(chkShipSchedM_Click)
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.BuildFilters.End
+
+Program.Sub.Serialize.Start
+	v.Local.sSerialize.Declare
+	f.Intrinsic.Control.Try
+'		gui.F_Maintenance.GsGcHeaderFields.Serialize("HeaderGV", v.Local.sSerialize)
+'		f.Global.Registry.AddValue(v.Caller.User, v.Caller.CompanyCode, "HeaderGV", "5523", 1001, False, "Serialize", False, 0, -999.0, 1/1/1980, 12:00:00 AM, v.Local.sSerialize)
+'		gui.F_Maintenance.GsGcLineFields.Serialize("LineGV", v.Local.sSerialize)
+'		f.Global.Registry.AddValue(v.Caller.User, v.Caller.CompanyCode, "LineGV", "5523", 1002, False, "Serialize", False, 0, -999.0, 1/1/1980, 12:00:00 AM, v.Local.sSerialize)
+'		gui.F_Maintenance.GsGcShipSchedSelectFields.Serialize("shipGV", v.Local.sSerialize)
+'		f.Global.Registry.AddValue(v.Caller.User, v.Caller.CompanyCode, "shipGV", "5523", 1003, False, "Serialize", False, 0, -999.0, 1/1/1980, 12:00:00 AM, v.Local.sSerialize)
+		gui.F_Maintenance.GsGcFieldtitles.Serialize("FieldTitlesGV", v.Local.sSerialize)
+		f.Global.Registry.AddValue(v.Caller.User, v.Caller.CompanyCode, "FieldTitlesGV", "5523", 1000, False, "Serialize", False, 0, -999.0, 1/1/1980, 12:00:00 AM, v.Local.sSerialize)
+	f.Intrinsic.Control.Catch
+		'f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.Serialize.End
+
+Program.Sub.Deserialize.Start
+	v.Local.sSerialize.Declare
+	f.Intrinsic.Control.Try
+		f.ODBC.Connection!common.OpenCommonConnection
+		'Field titles
+		f.Global.Registry.ReadValue(v.Caller.User, v.Caller.CompanyCode, "FieldTitlesGV", "5523", 1000, 5, "", v.Local.sSerialize)
+		f.Intrinsic.Control.If(v.Local.sSerialize, <>, "")
+			f.ODBC.Connection!common.Execute("delete from GS_REGISTRY where REG_ID = '5523'")
+		f.Intrinsic.Control.EndIf
+		f.Global.Registry.ReadValue(v.Caller.User, v.Caller.CompanyCode, "FieldTitlesGV", "5523", 1000, 5, "", v.Local.sSerialize)
+		f.Intrinsic.Control.If(v.Local.sSerialize.Trim, <>, "")
+			gui.F_Maintenance.GsGcFieldtitles.Deserialize(v.Local.sSerialize)
+		f.Intrinsic.Control.EndIf
+		
+'		'Header
+'		f.Global.Registry.ReadValue(v.Caller.User, v.Caller.CompanyCode, "HeaderGV",  "5523", 1001, 5, "", v.Local.sSerialize)
+'		f.Intrinsic.Control.If(v.Local.sSerialize.Trim, <>, "")
+'			gui.F_Maintenance.GsGcHeaderFields.Deserialize(v.Local.sSerialize)
+'		f.Intrinsic.Control.EndIf
+'		
+'		'Lines
+'		f.Global.Registry.ReadValue(v.Caller.User, v.Caller.CompanyCode, "LineGV",  "5523", 1002, 5, "", v.Local.sSerialize)
+'		f.Intrinsic.Control.If(v.Local.sSerialize.Trim, <>, "")
+'			gui.F_Maintenance.GsGcLineFields.Deserialize(v.Local.sSerialize)
+'		f.Intrinsic.Control.EndIf
+'		
+'		'Ship
+'		f.Global.Registry.ReadValue(v.Caller.User, v.Caller.CompanyCode, "ShipGV", "5523", 1003, 5, "", v.Local.sSerialize)
+'		f.Intrinsic.Control.If(v.Local.sSerialize.Trim, <>, "")
+'			gui.F_Maintenance.GsGcShipSchedSelectFields.Deserialize(v.Local.sSerialize)
+'		f.Intrinsic.Control.EndIf
+		f.ODBC.Connection!common.Close
+	f.Intrinsic.Control.Catch
+		f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+	f.Intrinsic.Control.EndTry
+Program.Sub.Deserialize.End
+
+Program.Sub.MoveCustomFiles.Start
+	v.Local.bVal.Declare(boolean)
+	v.Local.sFilePath.Declare(string)
+	v.Local.iRet.Declare(long)
+	v.Local.sTargetPath.Declare(string)
+	
+	f.Intrinsic.String.Build("{0}\CUSTOM\GCG_5523\",V.Caller.GlobalDir,V.Local.sFilePath)
+	f.Intrinsic.File.DirExists(V.Local.sFilePath,v.Local.bVal)
+	f.Intrinsic.Control.If(v.Local.bVal.Not)
+		f.Intrinsic.File.CreateDir(v.Local.sFilePath)
+	f.Intrinsic.Control.EndIf
+	f.Intrinsic.String.Build("{0}\GCG_5523_EDI_FIELDS_INFO_DATA.csv", v.Caller.DocDir, v.Local.sFilePath)
+	F.Intrinsic.File.Exists(V.Local.sFilePath,V.Local.bVal)
+	f.Intrinsic.Control.If(v.Local.bVal)
+		f.Intrinsic.String.Build("{0}\CUSTOM\GCG_5523\GCG_5523_EDI_FIELDS_INFO_DATA.csv", v.Caller.GlobalDir, v.Local.sTargetPath)
+		F.Intrinsic.File.Exists(V.Local.sTargetPath,V.Local.bVal)
+		f.Intrinsic.Control.If(v.Local.bVal.Not)
+			f.Intrinsic.File.MoveFile(v.Local.sFilePath,v.Local.sTargetPath,v.Local.iRet)
+		f.Intrinsic.Control.EndIf		
+	f.Intrinsic.Control.EndIf
+Program.Sub.MoveCustomFiles.End
+
+Program.Sub.optDateFormat4_Click.Start
+f.Intrinsic.Control.If(v.Screen.F_Maintenance!optDateFormat4.Value)
+	v.Global.sDateFormat.Set("4")
+f.Intrinsic.Control.EndIf
+Program.Sub.optDateFormat4_Click.End
+
+Program.Sub.cmdPreProcBrw_Click.Start
+v.Local.sRet.Declare
+f.Intrinsic.Control.Try
+'Try something
+	f.Intrinsic.UI.ShowOpenFileDialog(v.Caller.GasDir, "", v.Local.sRet)
+	f.Intrinsic.Control.If(v.Local.sRet, <>, "***CANCEL***")
+		gui.F_Maintenance.txtPreProcessor.Text(v.Local.sRet)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdPreProcBrw_Click.End
+
+Program.Sub.cmdDebug_Click.Start
+Function.Intrinsic.Debug.InvokeDebugger
+Function.Intrinsic.Debug.Stop
+Program.Sub.cmdDebug_Click.End
+
+Program.Sub.optDateFormat5_Click.Start
+f.Intrinsic.Control.If(v.Screen.F_Maintenance!optDateFormat5.Value)
+	v.Global.sDateFormat.Set("5")
+f.Intrinsic.Control.EndIf
+Program.Sub.optDateFormat5_Click.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$aanazco$}$20230621132721350$}$7aQAV3Tor/tR9bkuakHbuzQlHVuXCGOzuHsgUVyN91zV3uZBLxK2R8EfsaXlF2A0ddAYBFcVmzE=
+Program.Sub.Comments.End
