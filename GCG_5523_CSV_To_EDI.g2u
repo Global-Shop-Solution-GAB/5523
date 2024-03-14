@@ -1,0 +1,303 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.F_EDI_Convert..Create
+Gui.F_EDI_Convert..Size(6195,3510)
+Gui.F_EDI_Convert..MinX(0)
+Gui.F_EDI_Convert..MinY(0)
+Gui.F_EDI_Convert..Position(0,0)
+Gui.F_EDI_Convert..BackColor(-2147483633)
+Gui.F_EDI_Convert..MousePointer(0)
+Gui.F_EDI_Convert..Caption("Inbound File to EDI")
+Gui.F_EDI_Convert..MaxButton(False)
+Gui.F_EDI_Convert..MinButton(False)
+Gui.F_EDI_Convert..Sizeable(False)
+Gui.F_EDI_Convert..Event(UnLoad,F_EDI_Convert_UnLoad)
+Gui.F_EDI_Convert.lbl1.Create(Label,"Project:",True,690,255,0,2790,330,True,0,"Arial",8,-2147483633,0)
+Gui.F_EDI_Convert.frame1.Create(Frame)
+Gui.F_EDI_Convert.frame1.Size(5715,2130)
+Gui.F_EDI_Convert.frame1.Position(180,720)
+Gui.F_EDI_Convert.frame1.Enabled(False)
+Gui.F_EDI_Convert.cmdConvertEDI.Create(Button)
+Gui.F_EDI_Convert.cmdConvertEDI.Size(1440,375)
+Gui.F_EDI_Convert.cmdConvertEDI.Position(4185,1605)
+Gui.F_EDI_Convert.cmdConvertEDI.Parent("frame1")
+Gui.F_EDI_Convert.cmdConvertEDI.Caption("Generate")
+Gui.F_EDI_Convert.cmdConvertEDI.Event(Click,cmdConvertEDI_Click)
+Gui.F_EDI_Convert.cmdFolderDestBrw.Create(Button)
+Gui.F_EDI_Convert.cmdFolderDestBrw.Size(390,375)
+Gui.F_EDI_Convert.cmdFolderDestBrw.Position(5265,1125)
+Gui.F_EDI_Convert.cmdFolderDestBrw.Caption("^")
+Gui.F_EDI_Convert.cmdFolderDestBrw.Parent("frame1")
+Gui.F_EDI_Convert.cmdFolderDestBrw.Event(Click,cmdFolderDestBrw_Click)
+Gui.F_EDI_Convert.txtEdiFolderDest.Create(TextBox,"",True,4950,300,0,210,1200,True,0,"Arial",8,-2147483643,1)
+Gui.F_EDI_Convert.txtEdiFolderDest.Parent("frame1")
+Gui.F_EDI_Convert.txtCsvFileLoc.Create(TextBox,"",True,4965,300,0,180,540,True,0,"Arial",8,-2147483643,1)
+Gui.F_EDI_Convert.txtCsvFileLoc.Parent("frame1")
+Gui.F_EDI_Convert.cmdFileLocBrw.Create(Button)
+Gui.F_EDI_Convert.cmdFileLocBrw.Size(390,375)
+Gui.F_EDI_Convert.cmdFileLocBrw.Position(5250,510)
+Gui.F_EDI_Convert.cmdFileLocBrw.Caption("^")
+Gui.F_EDI_Convert.cmdFileLocBrw.Parent("frame1")
+Gui.F_EDI_Convert.cmdFileLocBrw.Event(Click,cmdFileLocBrw_Click)
+Gui.F_EDI_Convert.lbl3.Create(Label,"EDI Folder Destination",True,1935,255,0,195,960,True,0,"Arial",8,-2147483633,0)
+Gui.F_EDI_Convert.lbl3.Parent("frame1")
+Gui.F_EDI_Convert.lbl2.Create(Label,"Inbound File Location",True,1935,255,0,150,330,True,0,"Arial",8,-2147483633,0)
+Gui.F_EDI_Convert.lbl2.Parent("frame1")
+Gui.F_EDI_Convert.pic1.Create(PictureBox)
+Gui.F_EDI_Convert.pic1.Size(2535,585)
+Gui.F_EDI_Convert.pic1.Position(180,75)
+Gui.F_EDI_Convert.pic1.Event(DblClick,pic1_DblClick)
+Gui.F_EDI_Convert.cboProjectNames.Create(ComboBox)
+Gui.F_EDI_Convert.cboProjectNames.Size(2265,330)
+Gui.F_EDI_Convert.cboProjectNames.Position(3540,255)
+Gui.F_EDI_Convert.cboProjectNames.Event(Change,cbo1_Change)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+v.Global.sProjectName.Declare
+v.Global.sCsvDefaultFolderLoc.Declare
+v.Global.sEdiDefaultFolderDest.Declare
+v.Global.sProfileName.Declare
+v.Global.sScriptLoc.Declare
+v.Global.bReadFormat.Declare
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+v.Local.bLicense.Declare
+f.Global.General.ISLICENSEDBYMODULENAME("EDI", v.Local.bLicense)
+f.Intrinsic.Control.If(v.Local.bLicense, =, false)
+	f.Intrinsic.UI.Msgbox("No EDI License found. Please contact your Account Rep.")
+	f.Intrinsic.Control.End
+f.Intrinsic.Control.EndIf
+
+f.Intrinsic.Control.CallSub(loadPictureLogo)
+f.Intrinsic.Control.CallSub(loadProjectNames)
+gui.F_EDI_Convert..show
+
+Program.Sub.Main.End
+
+Program.Sub.ErrorMsg.Start
+v.Local.sError.Declare
+
+'Closes ODBC connection, default to connection : "con"
+f.Intrinsic.Control.If(v.ODBC!con.State, =, 1)
+	f.ODBC.Connection!con.Close
+f.Intrinsic.Control.EndIf
+
+'Generic Error message.
+f.Intrinsic.String.Build("Project GCG_5523_CSV_To_EDI.g2u {0}{0}Subroutine: {1}{0}Error: {2} with Description: {3}", v.Ambient.NewLine, v.Args.CurrentSub, v.Ambient.ErrorNumber, v.Ambient.ErrorDescription, v.Local.sError)
+f.Intrinsic.UI.Msgbox(v.Local.sError)
+Program.Sub.ErrorMsg.End
+
+Program.Sub.loadPictureLogo.Start
+f.Intrinsic.Control.Try
+	'Load the Logo at the top of dash and the Icon
+	v.Local.sIcon.Declare(String)
+	v.Local.sGssLogo.Declare(String)
+	v.Local.bExists.Declare
+	
+	f.Intrinsic.String.Build("{0}\ART\gss2.ico", v.Caller.GlobalDir, v.Local.sIcon)
+	f.Intrinsic.File.Exists(v.Local.sIcon, v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists)
+		gui.F_EDI_Convert..Icon(v.Local.sIcon)
+	f.Intrinsic.Control.EndIf
+
+	f.Intrinsic.String.Build("{0}\ART\GCG5523_GSS_LOGO.png", v.Caller.GlobalDir, v.Local.sGssLogo)
+	f.Intrinsic.File.Exists(v.Local.sGssLogo, v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists)
+		gui.F_EDI_Convert.pic1.Picture(v.Local.sGssLogo)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.loadPictureLogo.End
+
+Program.Sub.F_EDI_Convert_UnLoad.Start
+f.Intrinsic.Control.End
+Program.Sub.F_EDI_Convert_UnLoad.End
+
+Program.Sub.loadProjectNames.Start
+v.Local.iCnt.Declare
+f.Intrinsic.Control.Try
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Data.DataTable.CreateFromSQL("profileNamesDT", "con", "Select Distinct ProjectName from GCG_5523_EDI_OPTIONS", false)
+	f.ODBC.Connection!con.Close
+	gui.F_EDI_Convert.cboProjectNames.AddItem("")
+	f.Intrinsic.Control.For(v.Local.iCnt, 0, v.DataTable.profileNamesDT.RowCount--, 1)
+		gui.F_EDI_Convert.cboProjectNames.AddItem(v.DataTable.profileNamesDT(v.Local.iCnt).ProjectName!FieldValTrim)
+	f.Intrinsic.Control.Next(v.Local.iCnt)
+	f.Data.DataTable.Close("profileNamesDT")
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.loadProjectNames.End
+
+Program.Sub.pic1_DblClick.Start
+f.Intrinsic.Control.Try
+	f.Intrinsic.Task.ShellExec(0,"Open","http://www.globalshopsolutions.com/login-customer","","",0)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.pic1_DblClick.End
+
+Program.Sub.cbo1_Change.Start
+f.Intrinsic.Control.Try
+	f.Intrinsic.Control.If(v.Screen.F_EDI_Convert!cboProjectNames.Value, =, "")
+		gui.F_EDI_Convert.frame1.Enabled(False)
+		f.Intrinsic.Control.CallSub(clearDefaults)
+		gui.F_EDI_Convert.frame1.Caption("")
+	f.Intrinsic.Control.Else
+		gui.F_EDI_Convert.frame1.Enabled(True)
+		f.Intrinsic.Control.CallSub(loadDefaults)
+		gui.F_EDI_Convert.frame1.Caption(v.Screen.F_EDI_Convert!cboProjectNames.Value)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cbo1_Change.End
+
+Program.Sub.loadDefaults.Start
+v.Local.sSQL.Declare
+f.Intrinsic.Control.Try
+
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Intrinsic.String.Build("Select FieldTitle, FieldValue, FieldType, ProjectName, OrderId from GCG_5523_EDI_OPTIONS where ProjectName = '{0}' and FieldType = 'InputData' order by OrderId asc", v.Screen.F_EDI_Convert!cboProjectNames.Value, v.Local.sSQL)
+		f.Data.DataTable.CreateFromSQL("defaultsDT", "con", v.Local.sSQL, false)
+	f.ODBC.Connection!con.Close
+	
+	v.Global.sProjectName.Set(v.DataTable.defaultsDT(0).FieldValue!FieldValTrim)
+	v.Global.sCsvDefaultFolderLoc.Set(v.DataTable.defaultsDT(1).FieldValue!FieldValTrim)
+	v.Global.sEdiDefaultFolderDest.Set(v.DataTable.defaultsDT(2).FieldValue!FieldValTrim)
+	v.Global.sProfileName.Set(v.DataTable.defaultsDT(3).FieldValue!FieldValTrim)	
+	
+	f.Data.DataTable.Close("defaultsDT")	
+	
+	gui.F_EDI_Convert.txtCsvFileLoc.Text(v.Global.sCsvDefaultFolderLoc)
+	gui.F_EDI_Convert.txtEdiFolderDest.Text(v.Global.sEdiDefaultFolderDest)
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.loadDefaults.End
+
+Program.Sub.clearDefaults.Start
+f.Intrinsic.Control.Try
+	gui.F_EDI_Convert.txtCsvFileLoc.Text("")
+	gui.F_EDI_Convert.txtEdiFolderDest.Text("")
+	v.Global.sProjectName.Set("")
+	v.Global.sCsvDefaultFolderLoc.Set("")
+	v.Global.sEdiDefaultFolderDest.Set("")
+	v.Global.sProfileName.Set("")	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.clearDefaults.End
+
+Program.Sub.cmdFileLocBrw_Click.Start
+v.Local.sRet.Declare
+f.Intrinsic.Control.Try
+	f.Intrinsic.UI.ShowOpenFileDialog("", "CSV|*.csv", v.Global.sCsvDefaultFolderLoc, v.Local.sRet)
+	f.Intrinsic.Control.If(v.Local.sRet, <>, "***CANCEL***")
+		gui.F_EDI_Convert.txtCsvFileLoc.Text(v.Local.sRet)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdFileLocBrw_Click.End
+
+Program.Sub.cmdFolderDestBrw_Click.Start
+v.Local.sRet.Declare
+f.Intrinsic.Control.Try
+	f.Intrinsic.UI.FolderBrowser("EDI Destination", v.Local.sRet)
+	'f.Intrinsic.UI.ShowOpenFileDialog("", "", v.Global.sCsvDefaultFolderLoc, v.Local.sRet)
+	f.Intrinsic.Control.If(v.Local.sRet, <>, "***CANCEL***")
+		gui.F_EDI_Convert.txtEdiFolderDest.Text(v.Local.sRet)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdFolderDestBrw_Click.End
+
+Program.Sub.cmdConvertEDI_Click.Start
+v.Local.iRet.Declare
+v.Local.bLicense.Declare
+f.Intrinsic.Control.Try
+	f.Global.General.ISLICENSEDBYMODULENAME("EDI", v.Local.bLicense)
+	f.Intrinsic.Control.If(v.Local.bLicense, =, false)
+		f.Intrinsic.UI.Msgbox("No EDI License found. Please contact your Account Rep.")
+		f.Intrinsic.Control.End
+	f.Intrinsic.Control.EndIf
+	f.Intrinsic.UI.InvokeWaitDialog("Processsing...")
+	gui.F_EDI_Convert.cmdConvertEDI.Enabled(false)
+	f.Intrinsic.Control.CallSub(deleteRecord)
+	f.Intrinsic.Control.CallSub(readFormat)	
+	gui.F_EDI_Convert.cmdConvertEDI.Enabled(true)
+	f.Intrinsic.UI.CloseWaitDialog
+f.Intrinsic.Control.Catch
+	f.Intrinsic.UI.CloseWaitDialog
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdConvertEDI_Click.End
+
+Program.Sub.deleteRecord.Start
+v.Local.sSQL.Declare
+f.Intrinsic.Control.Try
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Intrinsic.String.Build("Delete from GCG_5523_PROFILES where RecordType = 'W' and GssUsername = '{0}' and Terminal ='{1}' and ProfileName = '{2}'", v.Caller.User, v.Caller.Terminal, v.Global.sProfileName, v.Local.sSQL)
+		f.ODBC.Connection!con.Execute(v.Local.sSQL)
+	f.ODBC.Connection!con.Close
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.deleteRecord.End
+
+Program.Sub.readFormat.Start
+v.Local.sSQL.Declare
+v.Local.iRet.Declare
+v.Local.sLoc.Declare
+f.Intrinsic.Control.Try
+	f.ODBC.Connection!con.OpenCompanyConnection
+		f.Intrinsic.String.Build("Select * from GCG_5523_PROFILES where RecordType = 'R'  and ProfileName = '{0}'", v.Global.sProfileName, v.Local.sSQL)
+		f.Data.DataTable.CreateFromSQL("readFormatDT", "con", v.Local.sSQL)
+	f.ODBC.Connection!con.Close
+	
+	f.Intrinsic.Control.If(v.DataTable.readFormatDT.RowCount, =, 1)
+		v.Global.bReadFormat.Set(true)
+		v.Global.sScriptLoc.Set(v.DataTable.readFormatDT(0).ScriptLocation!FieldValTrim)
+		f.ODBC.Connection!con.OpenCompanyConnection			
+			f.Intrinsic.String.Build("Insert into  GCG_5523_PROFILES (ProfileName, ScriptLocation, RecordType, GssUsername, Terminal, CSV_LocFile, Edi_DestFolder, ProjectToUse) Values ('{0}', '{1}', 'W', '{2}', '{3}', '{4}', '{5}', '{6}')", v.Global.sProfileName, v.Global.sScriptLoc, v.Caller.User, v.Caller.Terminal, v.Screen.F_EDI_Convert!txtCsvFileLoc.Text, v.Screen.F_EDI_Convert!txtEdiFolderDest.Text, v.Global.sProjectName, v.Local.sSQL)
+			f.ODBC.Connection!con.Execute(v.Local.sSQL)
+		f.ODBC.Connection!con.Close
+		'Check for PreProc
+		f.ODBC.Connection!con.OpenCompanyConnection	
+			f.Intrinsic.String.Build("Select top 1 UsePreProc from GCG_5523_PRE_PROC where ProjectToUse = '{0}'", v.Global.sProjectName, v.Local.sSQL)
+			f.ODBC.Connection!con.ExecuteAndReturn(v.Local.sSQL, v.Local.iRet)
+			f.Intrinsic.Control.If(v.Local.iRet, =, 1)
+				f.Intrinsic.String.Build("Select top 1 PreProcLoc from GCG_5523_PRE_PROC where ProjectToUse = '{0}'", v.Global.sProjectName, v.Local.sSQL)
+				f.ODBC.Connection!con.ExecuteAndReturn(v.Local.sSQL, v.Local.sLoc)
+				'CallRead
+				f.Intrinsic.Control.If(v.Local.sLoc.Trim, <>, "")
+					f.Global.General.CallSyncGAS(v.Local.sLoc)
+				f.Intrinsic.Control.EndIf			
+			f.Intrinsic.Control.EndIf
+		f.ODBC.Connection!con.Close
+		'CallRead
+		f.Global.General.CallSyncGAS(v.Global.sScriptLoc)
+		f.Intrinsic.Control.CallSub(deleteRecord)
+		f.Intrinsic.UI.Msgbox("EDI File Generated.")
+		f.Global.General.LaunchMenuTask(195, 0, v.Local.iRet)
+	f.Intrinsic.Control.Else
+		v.Global.bReadFormat.Set(false)
+		f.Intrinsic.UI.Msgbox("Missmatch in GCG_5523_PROFILES Datatable.", "Error")
+	f.Intrinsic.Control.EndIf
+	f.Data.DataTable.Close("readFormatDT")
+f.Intrinsic.Control.Catch
+	f.Intrinsic.Control.CallSub(ErrorMsg, CurrentSub, v.Ambient.CurrentSubroutine)
+f.Intrinsic.Control.EndTry
+Program.Sub.readFormat.End
+
+Program.Sub.openEDI.Start
+Program.Sub.openEDI.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$aanazco$}$20220916195213104$}$7aQAV3Tor/tR9bkuakHbuzQlHVuXCGOzGmdH6wkpI9VB5yiRukP3XcyPGKHZuTbB42tKurLXFXE=
+Program.Sub.Comments.End
